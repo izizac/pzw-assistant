@@ -1069,6 +1069,43 @@
     text-decoration: underline;
   }
 
+  /* Lista obecności: pole wyboru i nazwisko w jednym celu kliknięcia. */
+  ul.lista.obecnosci li { padding: 0; border-top: 1px solid var(--ramka); }
+
+  .obecny {
+    display: flex;
+    align-items: center;
+    gap: var(--p3);
+    min-height: var(--cel-dotyku);
+    padding: var(--p2) 0;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: var(--t3);
+    font-weight: var(--g-tekst);
+    color: var(--tekst);
+    cursor: pointer;
+  }
+
+  .obecny input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    min-height: 0;
+    margin: 0;
+    accent-color: var(--akcent);
+  }
+
+  .obecny .nazwa { display: block; font-weight: var(--g-etykieta); }
+
+  .komunikat.sukces {
+    background: var(--sukces-tlo);
+    color: var(--sukces-tekst);
+    border-color: var(--akcent-tlo);
+  }
+
+  [aria-busy="true"] ul.lista.obecnosci { opacity: 0.6; }
+
   .plakietka {
     display: inline-block;
     font-size: var(--t1);
@@ -1386,7 +1423,8 @@
             <a id="wynik-wydarzenie" target="_blank" rel="noopener">Otwórz w Kalendarzu Google</a>
           </p>
 
-          <button type="button" class="drugi szeroki" id="przycisk-mail" hidden></button>
+      
+    <button type="button" class="drugi szeroki" id="przycisk-mail" hidden></button>
         </div>
         <section id="sekcja-dodatkow" aria-labelledby="etykieta-dodatkow" hidden>
           <div class="pasek">
@@ -1402,7 +1440,24 @@
           </p>
         </section>
 
-        <button type="button" class="glowny szeroki" id="przycisk-nowe">
+        <section id="sekcja-obecnosci" aria-labelledby="etykieta-obecnosci" hidden>
+      <div class="pasek">
+        <h3 id="etykieta-obecnosci">Kto jest na sali</h3>
+        <span class="liczba" id="licznik-obecnosci"></span>
+      </div>
+      <p class="komunikat sukces" id="werdykt-obecnosci" role="status"></p>
+      <ul class="lista obecnosci" id="lista-obecnosci"></ul>
+      <p class="pusto" id="brak-skladu" hidden>
+        Skład tego organu nie jest wpisany w konfiguracji, więc nie ma czego
+        odklikać. Uzupełnij go w `czlonkowie` przy rodzaju posiedzenia.
+      </p>
+      <p class="wskazowka">
+        Zaznaczenia zapisują się od razu przy wydarzeniu, więc lista wygląda
+        tak samo na każdym komputerze.
+      </p>
+    </section>
+
+    <button type="button" class="glowny szeroki" id="przycisk-nowe">
           Zaplanuj kolejne posiedzenie
         </button>
 
@@ -2239,6 +2294,8 @@
    * to się chowa.
    */
   function pokazWynik(wynik) {
+    el('sekcja-obecnosci').hidden = true;
+
     tematMaila = wynik.tematMaila || wynik.temat || '';
     idOstatniegoWydarzenia = wynik.idWydarzenia || '';
 
@@ -3045,20 +3102,24 @@
     }
   }
 
-  // ── Frekwencja ───────────────────────────────────────────────────────────
+  // ── Lista obecności ──────────────────────────────────────────────────────
 
-  /** „Frekwencja” przy posiedzeniu: kto potwierdził i czy starczy na kworum. */
+  /**
+   * Obecność odklikuje się na sali, zwykle na jednym komputerze, więc lista
+   * musi być klikalna. Odpowiedzi z kalendarza to deklaracja sprzed
+   * posiedzenia i nie zastąpią listy obecności, do której odnosi się Statut.
+   */
   function przyciskFrekwencji(posiedzenie) {
     const przycisk = document.createElement('button');
 
     przycisk.type = 'button';
     przycisk.className = 'akcja';
-    przycisk.textContent = 'Frekwencja';
+    przycisk.textContent = 'Lista obecności';
     przycisk.addEventListener('click', async function () {
       schowajBlad();
 
       try {
-        pokazFrekwencje(await serwer('pobierzFrekwencje', posiedzenie.id));
+        pokazObecnosc(posiedzenie.id, await serwer('pobierzListeObecnosci', posiedzenie.id));
       } catch (blad) {
         pokazBlad(blad.message || String(blad));
       }
@@ -3067,31 +3128,98 @@
     return przycisk;
   }
 
-  function pokazFrekwencje(wynik) {
-    const zdania = [wynik.werdykt];
+  function pokazObecnosc(idWydarzenia, wynik) {
+    const lista = el('lista-obecnosci');
 
-    if (wynik.zaproszonych) {
-      zdania.push('Zaproszonych: ' + wynik.zaproszonych + '. ' +
-        wynik.pozycje.map(function (p) {
-          return p.nazwa + ': ' + p.ile;
-        }).join(', ') + '.');
-    }
-
-    // Frekwencja to informacja, nie błąd, więc idzie w pasek uwag.
     el('wynik-tytul').textContent = wynik.tytul;
-    el('wynik-termin').textContent = 'Frekwencja';
+    el('wynik-termin').textContent = 'Lista obecności';
     el('sekcja-tresci').hidden = true;
     el('sekcja-linku').hidden = true;
     el('sekcja-dodatkow').hidden = true;
     el('wskazowka-wyniku').hidden = true;
+    el('sekcja-obecnosci').hidden = false;
 
-    wypiszUwagi('uwagi', 'uwagi-lista', zdania);
+    lista.innerHTML = '';
+
+    if (!wynik.czlonkowie.length) {
+      el('brak-skladu').hidden = false;
+    } else {
+      el('brak-skladu').hidden = true;
+      wynik.czlonkowie.forEach(function (osoba) {
+        lista.appendChild(pozycjaObecnosci(idWydarzenia, osoba));
+      });
+    }
+
+    pokazWerdyktObecnosci(wynik);
 
     el('widok-formularza').hidden = true;
     el('widok-podgladu').hidden = true;
     el('widok-wyniku').hidden = false;
     window.scrollTo(0, 0);
     el('wynik-tytul').focus();
+  }
+
+  /** Jedna osoba na liście: pole wyboru, nazwisko, funkcja pod spodem. */
+  function pozycjaObecnosci(idWydarzenia, osoba) {
+    const pozycja = document.createElement('li');
+    const etykieta = document.createElement('label');
+    etykieta.className = 'obecny';
+
+    const pole = document.createElement('input');
+    pole.type = 'checkbox';
+    pole.checked = osoba.obecny;
+    pole.dataset.osoba = osoba.id;
+    pole.addEventListener('change', function () {
+      zapiszObecnych(idWydarzenia);
+    });
+
+    const opis = document.createElement('span');
+
+    const imie = document.createElement('span');
+    imie.className = 'nazwa';
+    imie.textContent = osoba.imie;
+    opis.appendChild(imie);
+
+    if (osoba.funkcja) {
+      const funkcja = document.createElement('span');
+      funkcja.className = 'opis';
+      funkcja.textContent = osoba.funkcja;
+      opis.appendChild(funkcja);
+    }
+
+    etykieta.appendChild(pole);
+    etykieta.appendChild(opis);
+    pozycja.appendChild(etykieta);
+
+    return pozycja;
+  }
+
+  /** Zapis leci po każdym kliknięciu; przy kilkunastu osobach to nic. */
+  async function zapiszObecnych(idWydarzenia) {
+    const obecni = Array.from(
+      el('lista-obecnosci').querySelectorAll('input:checked')
+    ).map(function (pole) { return pole.dataset.osoba; });
+
+    const sekcja = el('sekcja-obecnosci');
+    sekcja.setAttribute('aria-busy', 'true');
+
+    try {
+      pokazWerdyktObecnosci(
+        await serwer('zapiszObecnosc', { id: idWydarzenia, obecni: obecni })
+      );
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      sekcja.removeAttribute('aria-busy');
+    }
+  }
+
+  function pokazWerdyktObecnosci(wynik) {
+    el('licznik-obecnosci').textContent = wynik.obecnych + ' z ' + wynik.sklad;
+
+    const werdykt = el('werdykt-obecnosci');
+    werdykt.textContent = wynik.werdykt;
+    werdykt.className = 'komunikat ' + (wynik.pilne ? 'uwaga' : 'sukces');
   }
 
   // ── Plan roczny ──────────────────────────────────────────────────────────

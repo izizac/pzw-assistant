@@ -248,6 +248,25 @@ ATRAPA = """
       ],
       stanPrzypomnien: { dostepne: true, zainstalowany: false, godzina: 7 },
       pobierzDoZmiany: [],
+      pobierzListeObecnosci: {
+        tytul: 'Posiedzenie Zarządu Okręgu Mazowieckiego PZW',
+        organ: 'Posiedzenie Zarządu Okręgu',
+        sklad: 13, obecnych: 7,
+        werdykt: 'Obecnych 7 na 13 członków organu. Zwykła większość składu (7) jest. Na uchwały z kworum kwalifikowanym za mało: potrzeba 9 obecnych (§ 47 pkt 14).',
+        pilne: false,
+        czlonkowie: [
+          { id: 'kolodziejek', imie: 'Piotr Kołodziejek', funkcja: 'Prezes Zarządu Okręgu Mazowieckiego PZW', obecny: true },
+          { id: 'sobczak', imie: 'Daniel Sobczak', funkcja: 'Wiceprezes Zarządu Okręgu Mazowieckiego PZW ds. Sportu', obecny: true },
+          { id: 'pastusiak', imie: 'Waldemar Pastusiak', funkcja: 'Sekretarz Zarządu Okręgu Mazowieckiego PZW', obecny: true },
+          { id: 'czajkowski', imie: 'Radosław Czajkowski', funkcja: 'Skarbnik Zarządu Okręgu Mazowieckiego PZW', obecny: true },
+          { id: 'dygudaj', imie: 'Edward Dygudaj', funkcja: 'Wiceprezes Zarządu Okręgu Mazowieckiego PZW ds. Gospodarczych', obecny: true },
+          { id: 'ferens', imie: 'Dariusz Ferens', funkcja: 'Wiceprezes Zarządu Okręgu Mazowieckiego PZW ds. Zagospodarowania i Ochrony Wód', obecny: true },
+          { id: 'pacuszka', imie: 'Grzegorz Pacuszka', funkcja: 'Wiceprezes Zarządu Okręgu Mazowieckiego PZW ds. Młodzieży i Promocji', obecny: true },
+          { id: 'gomulka', imie: 'Grzegorz Gomułka', funkcja: 'Członek Zarządu Okręgu Mazowieckiego PZW', obecny: false },
+          { id: 'kryszczak', imie: 'Adam Kryszczak', funkcja: 'Członek Zarządu Okręgu Mazowieckiego PZW', obecny: false },
+        ],
+      },
+      zapiszObecnosc: { obecnych: 8, sklad: 13, werdykt: 'Obecnych 8 na 13 członków organu. Zwykła większość składu (7) jest.', pilne: false },
       zlozPodglad: {
         tytul: 'Posiedzenie Zarządu Okręgu Mazowieckiego PZW',
         kiedy: 'wtorek, 6 października 2026 r., 11:00–14:00',
@@ -337,6 +356,7 @@ ATRAPA = """
       };
     });
 
+    window.DANE = DANE;
     return uchwyt;
   })() } };
 
@@ -345,6 +365,18 @@ ATRAPA = """
   // Przepływ jest dwuetapowy: formularz składa podgląd, dopiero podgląd
   // tworzy wydarzenie. #podglad zatrzymuje się na pierwszym kroku,
   // #wynik przeklikuje do drugiego.
+  // Przycisk „Lista obecności" pojawia się tylko przy prawdziwym wydarzeniu,
+  // więc w podglądzie otwieramy ten widok wprost.
+  if (location.hash === '#obecnosc') {
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if (typeof pokazObecnosc === 'function') {
+          pokazObecnosc('podglad', window.DANE.pobierzListeObecnosci);
+        }
+      }, 700);
+    });
+  }
+
   if (location.hash === '#wynik' || location.hash === '#podglad') {
     window.addEventListener('load', function () {
       setTimeout(function () {
@@ -455,6 +487,7 @@ def zrzuty(plik: Path) -> None:
 
     zrzut(Path(str(plik) + '#podglad'), 'podglad', 1200, 1100)
     zrzut(Path(str(plik) + '#wynik'), 'wynik', 1200, 1100)
+    zrzut(Path(str(plik) + '#obecnosc'), 'obecnosc', 1200, 1150)
     zrzut(wersja_ciemna(plik), 'ciemny', 1200, 1000)
     zrzut(wersja_duzy_tekst(plik), 'duzy-tekst', 1200, 1300)
 

@@ -605,6 +605,20 @@ const RODZAJE_POSIEDZEN = [
 
   {
     id: 'okr',
+    /* Skład wybrany na VII Okręgowym Zjeździe Delegatów, 21 lutego 2026 r.
+       Lista służy odklikiwaniu obecności; nazwiska są jawne, opublikował
+       je sam Związek w relacji ze Zjazdu. */
+    czlonkowie: [
+      { id: 'chelstowski', imie: 'Sławomir Chełstowski', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+      { id: 'kaminski', imie: 'Andrzej Kamiński', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+      { id: 'kasprowicz', imie: 'Grzegorz Kasprowicz', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+      { id: 'lewandowski', imie: 'Zbigniew Lewandowski', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+      { id: 'lukasik', imie: 'Jerzy Łukasik', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+      { id: 'morawski', imie: 'Tomasz Morawski', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+      { id: 'rawski', imie: 'Kamil Rawski', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+      { id: 'suska', imie: 'Anna Suska', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+      { id: 'wojcik', imie: 'Józef Wójcik', funkcja: 'Członek Okręgowej Komisji Rewizyjnej' },
+    ],
     nazwa: 'Posiedzenie Okręgowej Komisji Rewizyjnej',
     tytul: 'Posiedzenie Okręgowej Komisji Rewizyjnej OM PZW',
     zdanieZwolania: 'zwołuję posiedzenie Okręgowej Komisji Rewizyjnej {okregu}, które odbędzie się',
@@ -648,6 +662,20 @@ const RODZAJE_POSIEDZEN = [
 
   {
     id: 'osk',
+    /* Skład wybrany na VII Okręgowym Zjeździe Delegatów, 21 lutego 2026 r.
+       Lista służy odklikiwaniu obecności; nazwiska są jawne, opublikował
+       je sam Związek w relacji ze Zjazdu. */
+    czlonkowie: [
+      { id: 'andrasik', imie: 'Robert Andrasik', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+      { id: 'frelik', imie: 'Tomasz Frelik', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+      { id: 'jusinski', imie: 'Sebastian Jusiński', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+      { id: 'klodkiewicz', imie: 'Radosław Kłódkiewicz', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+      { id: 'myszkowski', imie: 'Wiesław Myszkowski', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+      { id: 'nidzgorski', imie: 'Janusz Nidzgorski', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+      { id: 'rucinski', imie: 'Krzysztof Ruciński', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+      { id: 'trzaskowski', imie: 'Marek Trzaskowski', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+      { id: 'wojciechowski', imie: 'Mariusz Wojciechowski', funkcja: 'Członek Okręgowego Sądu Koleżeńskiego' },
+    ],
     nazwa: 'Posiedzenie Okręgowego Sądu Koleżeńskiego',
     tytul: 'Posiedzenie Okręgowego Sądu Koleżeńskiego OM PZW',
     zdanieZwolania: 'zwołuję posiedzenie Okręgowego Sądu Koleżeńskiego {okregu}, które odbędzie się',
