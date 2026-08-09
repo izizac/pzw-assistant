@@ -11,8 +11,27 @@
     --zaokraglenie: 10px;
     --zaokraglenie-male: 6px;
 
+    /* Sześć stopni pisma z wyraźnymi skokami. Wcześniej było ich szesnaście,
+       w większości między 0,7 a 0,92 rem — to nie hierarchia, tylko szum,
+       i jeden z częściej wskazywanych powodów, dla których interfejs wygląda
+       na złożony automatem. */
+    --t1: 0.7rem;      /* etykiety wersalikowe */
+    --t2: 0.8rem;      /* podpisy, wskazówki */
+    --t3: 0.9375rem;   /* listy, tekst drugorzędny */
+    --t4: 1rem;        /* baza, pola formularza */
+    --t5: 1.25rem;     /* tytuły kart */
+    --t6: 1.9rem;      /* nagłówek strony */
+
+    /* Trzy grubości, każda z własnym zadaniem: tekst, etykieta, nagłówek. */
+    --g-tekst: 400;
+    --g-etykieta: 600;
+    --g-naglowek: 700;
+
     /* Minimalna wysokość celu dotykowego — 44 px wg WCAG 2.5.5. */
     --cel-dotyku: 44px;
+    /* Odstęp wewnętrzny kontrolek: dobrany tak, żeby pole wraz z ramką
+       trafiło w 44 px celu dotykowego. Nie należy do skali odstępów. */
+    --p-kontrolka: 10px;
 
     /* Szerokość prawej kolumny. Próg 840 px dobrany tak, żeby przy dwóch
        kolumnach na główną zostało ~530 px — poniżej formularz robi się ciasny. */
@@ -25,49 +44,72 @@
     --krój-maszynowy: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
     /* Barwy odczytane z pikseli serwisu Okręgu (om.pzw.pl): belka nagłówka
-       #020c3a, przycisk główny #012880, akcent pomocniczy #084685.
-       Godło Okręgu ma własny, jaśniejszy błękit #4e76b4 — używamy go tylko
-       tam, gdzie występuje samo godło (favikona). */
+       #020c3a, przycisk główny #012880. Godło Okręgu ma własny, jaśniejszy
+       błękit #4e76b4, używany wyłącznie tam, gdzie występuje samo godło,
+       czyli w favikonie. */
     --granat: #020c3a;
-    --granat-2: #06154d;
-    --blekit: #084685;
-    --blekit-wash: #e8eefb;
 
-    --tlo: #f2f4f9;
-    --karta: #ffffff;
-    --karta-2: #edf1f9;
-    --tekst: #0f1729;
-    --tekst-2: #4e5c75;
-    --ramka: #d9dfeb;
-    --ramka-mocna: #808ea6;
+    /* Paleta w układzie ról Material Design 3, wygenerowana z ziarna
+       #012880 przez scripts/tony.py. Material nie jest tu biblioteką, tylko
+       systemem nazw i stopni tonalnych: element dostaje barwę z nazwy zadania,
+       nie z doraźnego wyboru. Nie edytuj tych wartości ręcznie, zmień ziarno
+       i uruchom generator. */
+  --m3-primary: #214389;
+  --m3-on-primary: #ffffff;
+  --m3-primary-container: #d0dffa;
+  --m3-on-primary-container: #000210;
+  --m3-surface: #f8f8f9;
+  --m3-on-surface: #030304;
+  --m3-surface-container-low: #f1f2f2;
+  --m3-surface-container: #ebebec;
+  --m3-surface-container-high: #e4e4e5;
+  --m3-surface-variant: #dcdee1;
+  --m3-on-surface-variant: #2a2e34;
+  --m3-outline: #5e636d;
+  --m3-outline-variant: #babec4;
+  --m3-inverse-surface: #151618;
+  --m3-inverse-on-surface: #eeeeef;
+  --m3-error: #870f17;
+  --m3-on-error: #ffffff;
+  --m3-error-container: #fed2ce;
+  --m3-on-error-container: #0f0000;
 
-    --akcent: #012880;
-    --akcent-ciemny: #06154d;
-    --akcent-tlo: #e8eefb;
+    /* Nazwy używane w regułach wskazują na role, nie na odcienie. */
+    --tlo: var(--m3-surface-container-low);
+    --karta: var(--m3-surface);
+    --karta-2: var(--m3-surface-container);
+    --tekst: var(--m3-on-surface);
+    --tekst-2: var(--m3-on-surface-variant);
+    --ramka: var(--m3-outline-variant);
+    --ramka-mocna: var(--m3-outline);
 
-    /* Stany cyklu statutowego. Zestaw przeszedł walidator palety: ΔE 20,2
-       przy zwykłym widzeniu i 12,3 przy deuteranopii, każdy powyżej 3:1
-       wobec toru #e8eefb. Barwa nigdy nie niesie znaczenia sama — obok
-       stoi etykieta słowna. */
-    --w-terminie: #1f5aa8;
-    --blisko: #94700a;
-    --po-terminie: #9c1330;
+    --granat: var(--m3-on-primary-container);
+    --akcent: var(--m3-primary);
+    --akcent-ciemny: var(--m3-on-primary-container);
+    --akcent-tlo: var(--m3-primary-container);
 
-    --blad-tlo: #fcece9;
-    --blad-tekst: #952415;
-    --blad-ramka: #eec5bd;
+    --blad-tlo: var(--m3-error-container);
+    --blad-tekst: var(--m3-on-error-container);
+    --blad-ramka: var(--m3-error);
 
-    /* Ostrzeżenia w barwie pieczęci — bliżej urzędowego pisma niż żółty alert. */
+    --sukces-tlo: var(--m3-primary-container);
+    --sukces-tekst: var(--m3-on-primary-container);
+
+    --na-granacie: var(--m3-primary-container);
+    --na-granacie-slaby: var(--m3-outline-variant);
+    --napis-na-akcencie: var(--m3-on-primary);
+
+    /* Material 3 ma tylko rolę błędu; ostrzeżenia i stany cyklu nie mają
+       w nim odpowiednika, więc zostają jako własne barwy. Wszystkie przeszły
+       walidator palety ze skilla dataviz i sprawdzian kontrastu. */
     --uwaga-tlo: #fbf1e8;
     --uwaga-tekst: #874026;
     --uwaga-ramka: #e5cbb7;
 
-    --sukces-tlo: #e8eefb;
-    --sukces-tekst: #012880;
+    --w-terminie: #1f5aa8;
+    --blisko: #8a6808;
+    --po-terminie: #9c1330;
 
-    /* Bez cieni. Portal Okręgu ma karty płaskie, a jednakowy cień na każdej
-       powierzchni to jeden z najczęściej wymienianych znaków interfejsu
-       generowanego maszynowo. Głębię niesie tło i hierarchia, nie rozmycie. */
     --cien: none;
     --cien-naglowka: none;
   }
@@ -75,36 +117,58 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --granat: #020c3a;
-      --granat-2: #06154d;
-      --blekit: #6f96d4;
-      --blekit-wash: #16234a;
+  
+    --m3-primary: #a4bef0;
+    --m3-on-primary: #031338;
+    --m3-primary-container: #0e2961;
+    --m3-on-primary-container: #d0dffa;
+    --m3-surface: #010101;
+    --m3-on-surface: #dddedf;
+    --m3-surface-container-low: #030304;
+    --m3-surface-container: #050606;
+    --m3-surface-container-high: #0f0f11;
+    --m3-surface-variant: #2a2e34;
+    --m3-on-surface-variant: #babec4;
+    --m3-outline: #7b808a;
+    --m3-outline-variant: #2a2e34;
+    --m3-inverse-surface: #dddedf;
+    --m3-inverse-on-surface: #151618;
+    --m3-error: #f5a69f;
+    --m3-on-error: #360000;
+    --m3-error-container: #5f0005;
+    --m3-on-error-container: #fed2ce;
 
-      --tlo: #0e131a;
-      --karta: #171e28;
-      --karta-2: #1f2733;
-      --tekst: #e8edf4;
-      --tekst-2: #9daabd;
-      --ramka: #2a3441;
-      --ramka-mocna: #5d6b7f;
+      --tlo: var(--m3-surface);
+      --karta: var(--m3-surface-container-low);
+      --karta-2: var(--m3-surface-container);
+      --tekst: var(--m3-on-surface);
+      --tekst-2: var(--m3-on-surface-variant);
+      --ramka: var(--m3-outline-variant);
+      --ramka-mocna: var(--m3-outline);
 
-      --akcent: #8fb0ee;
-      --akcent-ciemny: #aac6f5;
-      --akcent-tlo: #16234a;
+      --granat: var(--m3-surface-container-high);
+      --akcent: var(--m3-primary);
+      --akcent-ciemny: var(--m3-on-primary-container);
+      --akcent-tlo: var(--m3-primary-container);
 
-      --w-terminie: #6f9ee0;
-      --blisko: #d9a53a;
-      --po-terminie: #e8737f;
+      --blad-tlo: var(--m3-error-container);
+      --blad-tekst: var(--m3-on-error-container);
+      --blad-ramka: var(--m3-error);
 
-      --blad-tlo: #331d19;
-      --blad-tekst: #f3b6ab;
-      --blad-ramka: #542d25;
+      --sukces-tlo: var(--m3-primary-container);
+      --sukces-tekst: var(--m3-on-primary-container);
+
+      --na-granacie: var(--m3-on-surface);
+      --na-granacie-slaby: var(--m3-on-surface-variant);
+      --napis-na-akcencie: var(--m3-on-primary);
 
       --uwaga-tlo: #2d2018;
       --uwaga-tekst: #eaba98;
       --uwaga-ramka: #4d3729;
 
-      --sukces-tlo: #16234a;
-      --sukces-tekst: #aac6f5;
+      --w-terminie: #6f9ee0;
+      --blisko: #d9a53a;
+      --po-terminie: #e8737f;
 
       --cien: none;
       --cien-naglowka: none;
@@ -116,7 +180,8 @@
 
   body {
     margin: 0;
-    padding: var(--p5) var(--p4) var(--p7);
+    /* Bez odstępu u góry: belka ma dotykać krawędzi okna. */
+    padding: 0 var(--p4) var(--p7);
     background: var(--tlo);
     color: var(--tekst);
     font: 16px/1.55 var(--krój-tekstowy);
@@ -169,22 +234,25 @@
      Narzędzie produkuje pismo urzędowe, więc strona zaczyna się tak, jak
      zaczyna się blankiet Okręgu: godłem, nazwą i teleadresem.               */
 
+  /* Belka idzie od krawędzi do krawędzi okna, jak w serwisie Okręgu.
+     Bez tego strona jest stosem jednakowych zaokrąglonych prostokątów,
+     a to jedna z cech, po których poznaje się układ złożony automatem. */
+  .belka {
+    background: var(--granat);
+    /* Wyjście poza wewnętrzny odstęp body; bez 100vw, które przy widocznym
+       pasku przewijania dokłada poziomy suwak. */
+    margin: 0 calc(var(--p4) * -1) var(--p6);
+    padding: var(--p5) var(--p4);
+    color: #fff;
+  }
+
   .blankiet {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--p4) var(--p5);
-    /* Serwis Okręgu ma belkę płaską — bez gradientu. */
-    background: var(--granat);
-    border-radius: var(--zaokraglenie);
-    box-shadow: var(--cien-naglowka);
-    padding: var(--p5) var(--p4);
-    margin-bottom: var(--p5);
-    color: #fff;
-  }
-
-  @media (min-width: 480px) {
-    .blankiet { padding: var(--p5) var(--p5) var(--p5) var(--p6); }
+    max-width: 1040px;
+    margin: 0 auto;
   }
 
   .blankiet .logo {
@@ -196,18 +264,20 @@
   .blankiet-tresc { flex: 1 1 240px; min-width: 0; }
 
   .blankiet h1 {
-    font-size: 1.55rem;
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.025em;
-    margin: 0 0 var(--p1);
+    font-size: var(--t6);
+    font-weight: var(--g-naglowek);
+    line-height: 1.08;
+    /* Im większy stopień, tym ciaśniejszy trakt — inaczej duży napis się
+       rozłazi. Przy etykietach wersalikowych jest odwrotnie. */
+    letter-spacing: -0.03em;
+    margin: 0 0 var(--p2);
   }
 
   .blankiet .jednostka {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: var(--t3);
+    font-weight: var(--g-etykieta);
     line-height: 1.35;
-    color: #b9c6e6;
+    color: var(--na-granacie);
     margin: 0;
   }
 
@@ -219,11 +289,11 @@
     gap: var(--p1) var(--p4);
     padding-top: var(--p3);
     border-top: 1px solid rgba(255, 255, 255, 0.18);
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: var(--t1);
+    font-weight: var(--g-etykieta);
     letter-spacing: 0.09em;
     text-transform: uppercase;
-    color: #b6c7e0;
+    color: var(--na-granacie-slaby);
     margin: 0;
   }
 
@@ -236,7 +306,7 @@
     border: 1px solid var(--ramka);
     border-radius: var(--zaokraglenie);
     padding: var(--p5) var(--p4);
-    margin-bottom: var(--p4);
+    margin-bottom: var(--p5);
     box-shadow: var(--cien);
   }
 
@@ -260,14 +330,21 @@
 
   .bok .karta.zwarta:first-child { border-top: none; padding-top: 0; }
 
+  .tytul-karty {
+    font-size: var(--t5);
+    font-weight: var(--g-naglowek);
+    letter-spacing: -0.015em;
+    margin: 0 0 var(--p4);
+  }
+
   /* Nagłówek karty bocznej: etykieta z lewej, licznik z prawej. */
   .tytul-boczny {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: var(--p2);
-    font-size: 0.74rem;
-    font-weight: 700;
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--tekst-2);
@@ -275,8 +352,8 @@
   }
 
   .tytul-boczny .liczba {
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-size: var(--t1);
+    font-weight: var(--g-etykieta);
     letter-spacing: 0;
     color: var(--tekst-2);
     background: var(--karta-2);
@@ -289,84 +366,100 @@
      zostało. Barwy wypełnień przeszły walidator palety (rozróżnialność przy
      zaburzeniach widzenia barw i kontrast wobec toru).                      */
 
+  /* Bez obudowy karty: leży wprost na tle strony, oddzielony kreską.
+     Cztery różne powierzchnie zamiast czterech takich samych pudełek. */
   .pas-terminow {
-    background: var(--karta);
-    border: 1px solid var(--ramka);
-    border-radius: var(--zaokraglenie);
-    padding: var(--p4);
-    margin-bottom: var(--p4);
-  }
-
-  @media (min-width: 480px) {
-    .pas-terminow { padding: var(--p5); }
+    padding: 0 0 var(--p5);
+    margin-bottom: var(--p5);
+    border-bottom: 1px solid var(--ramka);
   }
 
   .pas-naglowek {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--p3);
     margin-bottom: var(--p4);
   }
 
+  /* Na wąskim ekranie przycisk schodzi pod nagłówek, zamiast go ściskać. */
+  .pas-naglowek .drugi { flex-basis: 100%; }
+
+  @media (min-width: 560px) {
+    .pas-naglowek .drugi { flex-basis: auto; margin-left: auto; }
+  }
+
   .pas-naglowek h2 {
-    font-size: 0.74rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--tekst-2);
     margin: 0;
   }
 
   .pas-naglowek .liczba {
-    font-size: 0.72rem;
-    font-weight: 700;
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
     color: #fff;
     background: var(--po-terminie);
     border-radius: 999px;
     padding: 1px var(--p2);
   }
 
-  .pas-naglowek .drugi { margin-left: auto; }
-
   .wskazniki { list-style: none; margin: 0; padding: 0; }
 
-  /* Jeden wiersz na organ: nazwa, tor wskaźnika, stan. Na wąskim ekranie
-     wszystko układa się pionowo. */
+  /* Wiersz jest samodzielnym blokiem: nazwa i stan w jednej linii, pod nimi
+     pasek na całą szerokość, na końcu daty. Wcześniej trzy kolumny rozjeżdżały
+     się na szerokim ekranie i oko gubiło związek nazwy ze stanem. */
   .wskazniki li {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--p1) var(--p4);
-    padding: var(--p3) 0;
+    padding: var(--p4) 0;
     border-top: 1px solid var(--ramka);
   }
 
   .wskazniki li:first-child { border-top: none; padding-top: 0; }
 
-  @media (min-width: 660px) {
-    .wskazniki li {
-      grid-template-columns: minmax(180px, 15rem) 1fr minmax(150px, auto);
-      align-items: center;
-      gap: var(--p4);
-    }
+  /* Wiersz, z którego da się zwołać posiedzenie, zachowuje się jak przycisk. */
+  .wskazniki li.klikalny .wiersz { cursor: pointer; }
+
+  .wskazniki li.klikalny .wiersz:hover .organ,
+  .wskazniki li.klikalny .wiersz:focus-visible .organ {
+    color: var(--akcent);
+    text-decoration: underline;
+  }
+
+  .wskazniki .wiersz {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--p1) var(--p3);
+    margin-bottom: var(--p2);
   }
 
   .wskazniki .organ {
-    font-size: 0.92rem;
-    font-weight: 600;
+    font-size: var(--t3);
+    font-weight: var(--g-etykieta);
     line-height: 1.3;
   }
 
-  .wskazniki .organ .cykl {
-    display: block;
-    font-size: 0.78rem;
-    font-weight: 400;
-    color: var(--tekst-2);
+  .wskazniki .etykieta {
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
+
+  .wskazniki li[data-stan="przekroczony"] .etykieta { color: var(--po-terminie); }
+  .wskazniki li[data-stan="blisko"] .etykieta { color: var(--blisko); }
+  .wskazniki li[data-stan="ok"] .etykieta { color: var(--w-terminie); }
+  .wskazniki li[data-stan="brak"] .etykieta { color: var(--tekst-2); }
 
   /* Tor w jaśniejszym kroku tej samej rodziny, żeby stan czytał się
      przez całą szerokość paska. */
   .tor {
-    position: relative;
+    display: block;
     height: 8px;
     background: var(--akcent-tlo);
     border-radius: 999px;
@@ -384,23 +477,17 @@
   .wskazniki li[data-stan="blisko"] .wypelnienie { background: var(--blisko); }
   .wskazniki li[data-stan="przekroczony"] .wypelnienie { background: var(--po-terminie); }
 
-  .wskazniki .stan {
-    font-size: 0.82rem;
+  /* Daty pod paskiem: cykl z lewej, termin z prawej. */
+  .wskazniki .daty {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--p1) var(--p3);
+    margin-top: var(--p2);
+    font-size: var(--t2);
     color: var(--tekst-2);
-    line-height: 1.35;
+    font-variant-numeric: tabular-nums;
   }
-
-  .wskazniki .stan .etykieta {
-    display: block;
-    font-weight: 700;
-    font-size: 0.72rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .wskazniki li[data-stan="przekroczony"] .etykieta { color: var(--po-terminie); }
-  .wskazniki li[data-stan="blisko"] .etykieta { color: var(--blisko); }
-  .wskazniki li[data-stan="ok"] .etykieta { color: var(--w-terminie); }
 
   @media (prefers-reduced-motion: reduce) {
     .tor .wypelnienie { transition: none; }
@@ -412,8 +499,8 @@
 
   label {
     display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: var(--t2);
+    font-weight: var(--g-etykieta);
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--tekst-2);
@@ -422,13 +509,13 @@
 
   label .dodatek {
     text-transform: none;
-    font-weight: 400;
+    font-weight: var(--g-tekst);
   }
 
   input, textarea, select {
     width: 100%;
     min-height: var(--cel-dotyku);
-    padding: 10px var(--p3);
+    padding: var(--p-kontrolka) var(--p3);
     font: inherit;
     color: var(--tekst);
     background: var(--karta);
@@ -467,7 +554,7 @@
   }
 
   .wskazowka {
-    font-size: 0.82rem;
+    font-size: var(--t2);
     line-height: 1.45;
     color: var(--tekst-2);
     margin: var(--p2) 0 0;
@@ -492,8 +579,8 @@
     gap: var(--p2);
     min-height: var(--cel-dotyku);
     padding: var(--p2) var(--p3);
-    font-size: 0.86rem;
-    font-weight: 600;
+    font-size: var(--t3);
+    font-weight: var(--g-etykieta);
     color: var(--tekst);
     cursor: pointer;
     list-style: none;
@@ -517,8 +604,8 @@
 
   summary .licznik {
     margin-left: auto;
-    font-weight: 400;
-    font-size: 0.8rem;
+    font-weight: var(--g-tekst);
+    font-size: var(--t2);
     color: var(--tekst-2);
     text-align: right;
   }
@@ -536,7 +623,7 @@
 
   #wymogi-podsumowanie {
     font-family: var(--krój-maszynowy);
-    font-size: 0.75rem;
+    font-size: var(--t1);
     color: var(--akcent);
   }
 
@@ -544,19 +631,19 @@
     margin: 0;
     display: grid;
     grid-template-columns: 1fr;
-    font-size: 0.85rem;
+    font-size: var(--t3);
   }
 
   @media (min-width: 480px) {
     .wymogi dl { grid-template-columns: max-content 1fr; gap: var(--p2) var(--p4); }
   }
 
-  .wymogi dt { font-weight: 600; color: var(--tekst); }
+  .wymogi dt { font-weight: var(--g-etykieta); color: var(--tekst); }
   .wymogi dd { margin: 0 0 var(--p2); color: var(--tekst-2); }
 
   .wymogi dd.paragraf {
     font-family: var(--krój-maszynowy);
-    font-size: 0.8rem;
+    font-size: var(--t2);
     color: var(--akcent);
   }
 
@@ -571,7 +658,7 @@
     border-radius: var(--zaokraglenie-male);
     padding: var(--p3) var(--p4);
     margin-bottom: var(--p4);
-    font-size: 0.9rem;
+    font-size: var(--t3);
     line-height: 1.5;
   }
 
@@ -595,10 +682,10 @@
   .status {
     display: flex;
     gap: var(--p2);
-    font-size: 0.84rem;
+    font-size: var(--t2);
     margin: 0 0 var(--p4);
   }
-  .status .znak { flex: none; font-weight: 700; }
+  .status .znak { flex: none; font-weight: var(--g-naglowek); }
   .status.ok { color: var(--akcent); }
   .status.ostrzezenie { color: var(--uwaga-tekst); }
 
@@ -606,11 +693,11 @@
 
   button {
     font: inherit;
-    font-weight: 600;
+    font-weight: var(--g-etykieta);
     min-height: var(--cel-dotyku);
     border: 1px solid transparent;
     border-radius: var(--zaokraglenie-male);
-    padding: 10px var(--p4);
+    padding: var(--p-kontrolka) var(--p4);
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease;
   }
@@ -626,7 +713,7 @@
 
   @media (prefers-color-scheme: dark) {
     /* Napis w granacie, nie w czerni — ta sama rodzina co blankiet. */
-    .glowny { color: #0d1826; }
+    .glowny { color: var(--napis-na-akcencie); }
   }
 
   .drugi {
@@ -634,7 +721,7 @@
     color: var(--akcent);
     border-color: var(--ramka-mocna);
     padding: var(--p2) var(--p3);
-    font-size: 0.86rem;
+    font-size: var(--t3);
     min-height: 36px;
   }
   .drugi:hover:not(:disabled) { border-color: var(--akcent); background: var(--akcent-tlo); }
@@ -652,8 +739,8 @@
 
   .podsumowanie strong {
     display: block;
-    font-size: 1.05rem;
-    font-weight: 700;
+    font-size: var(--t5);
+    font-weight: var(--g-naglowek);
     letter-spacing: -0.01em;
     color: var(--sukces-tekst);
     line-height: 1.35;
@@ -664,7 +751,7 @@
   .podsumowanie .termin {
     display: block;
     color: var(--tekst-2);
-    font-size: 0.88rem;
+    font-size: var(--t3);
     margin-top: var(--p1);
   }
 
@@ -677,8 +764,8 @@
   }
 
   .pasek h3 {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: var(--t2);
+    font-weight: var(--g-etykieta);
     text-transform: uppercase;
     letter-spacing: 0.02em;
     color: var(--tekst-2);
@@ -689,7 +776,7 @@
     min-height: 320px;
     resize: vertical;
     font-family: var(--krój-maszynowy);
-    font-size: 0.84rem;
+    font-size: var(--t2);
     line-height: 1.65;
     white-space: pre-wrap;
   }
@@ -697,7 +784,7 @@
   #porzadek {
     min-height: 160px;
     resize: vertical;
-    font-size: 0.88rem;
+    font-size: var(--t3);
     line-height: 1.5;
   }
 
@@ -707,7 +794,7 @@
   .link-meet {
     display: block;
     font-family: var(--krój-maszynowy);
-    font-size: 0.86rem;
+    font-size: var(--t3);
     word-break: break-all;
     margin-bottom: var(--p4);
   }
@@ -719,20 +806,22 @@
   ul.lista li {
     padding: var(--p3) 0;
     border-top: 1px solid var(--ramka);
-    font-size: 0.92rem;
+    font-size: var(--t3);
   }
   ul.lista li:first-child { border-top: none; padding-top: 0; }
 
   ul.lista .opis {
     display: block;
     color: var(--tekst-2);
-    font-size: 0.84rem;
+    font-size: var(--t2);
     margin-top: 2px;
+    /* Cyfry o stałej szerokości: daty i godziny ustawiają się w kolumnę. */
+    font-variant-numeric: tabular-nums;
   }
 
   /* W prawej kolumnie listy są ciaśniejsze i mniejsze. */
-  .zwarta ul.lista li { padding: var(--p2) 0; font-size: 0.88rem; }
-  .zwarta ul.lista .opis { font-size: 0.8rem; }
+  .zwarta ul.lista li { padding: var(--p2) 0; font-size: var(--t3); }
+  .zwarta ul.lista .opis { font-size: var(--t2); }
 
   /* Wiersz dodatku: pole wyboru i nazwa w jednej linii, reszta pod spodem. */
   label.dodatek {
@@ -741,8 +830,8 @@
     gap: var(--p2);
     min-height: var(--cel-dotyku);
     margin: 0;
-    font-size: 0.92rem;
-    font-weight: 400;
+    font-size: var(--t3);
+    font-weight: var(--g-tekst);
     letter-spacing: 0;
     text-transform: none;
     color: var(--tekst);
@@ -756,9 +845,216 @@
     accent-color: var(--akcent);
   }
 
-  label.dodatek .nazwa { font-weight: 600; }
+  label.dodatek .nazwa { font-weight: var(--g-etykieta); }
 
   li[aria-busy='true'] .stan-dodatku { opacity: 0.7; }
+
+  /* Śródtytuł etapu: przed posiedzeniem, na posiedzenie, po posiedzeniu. */
+  ul.lista li.grupa-etapu {
+    padding-top: var(--p4);
+    border-top: none;
+  }
+
+  ul.lista li.grupa-etapu:first-child { padding-top: 0; }
+
+  /* Otoczenie terminu: cicha lista tuż pod datą, nie druga karta. */
+  .otoczenie {
+    background: var(--karta-2);
+    border-radius: var(--zaokraglenie-male);
+    padding: var(--p3) var(--p4);
+    margin: 0 0 var(--p4);
+  }
+
+  /* Siatka w trakcie wczytywania: przygaszona, ale nadal czytelna. */
+  #siatka-kalendarza.czeka { opacity: 0.45; transition: opacity 0.15s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #siatka-kalendarza.czeka { transition: none; }
+  }
+
+  .nawigacja-miesiaca {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--p2);
+    margin-bottom: var(--p2);
+  }
+
+  .nawigacja-miesiaca strong {
+    font-size: var(--t3);
+    font-weight: var(--g-etykieta);
+  }
+
+  /* Strzałki miesiąca: kwadratowe, ale nadal pełny cel dotykowy. */
+  .drugi.krok {
+    min-width: var(--cel-dotyku);
+    min-height: var(--cel-dotyku);
+    padding: 0;
+    font-size: var(--t5);
+    line-height: 1;
+  }
+
+  /* Dzień jest przyciskiem, nie komórką z nasłuchem — działa klawiatura
+     i czytnik ekranu ogłasza go jako element do kliknięcia. */
+  table.kalendarzyk td button {
+    display: block;
+    width: 100%;
+    min-height: 0;
+    padding: var(--p1) 0;
+    background: none;
+    border: none;
+    border-radius: var(--zaokraglenie-male);
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  table.kalendarzyk td button:hover { background: var(--akcent-tlo); }
+
+  .otoczenie h3 {
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tekst-2);
+    margin: 0 0 var(--p2);
+  }
+
+  .otoczenie ul.lista li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--p2);
+    padding: var(--p1) 0;
+    border-top: none;
+    font-size: var(--t3);
+  }
+
+  /* Odległość od wybranego dnia niesie tę samą treść co kolejność listy. */
+  .otoczenie .kiedy {
+    flex: none;
+    min-width: 8.5em;
+    font-variant-numeric: tabular-nums;
+    color: var(--tekst-2);
+    font-size: var(--t2);
+  }
+
+  .otoczenie li.ten-dzien .kiedy,
+  .otoczenie li.ten-dzien .nazwa { font-weight: var(--g-naglowek); color: var(--uwaga-tekst); }
+
+  /* ── Siatka miesiąca ──────────────────────────────────────────────────── */
+
+  table.kalendarzyk {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--p3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  table.kalendarzyk caption {
+    text-align: left;
+    font-size: var(--t3);
+    font-weight: var(--g-naglowek);
+    color: var(--tekst);
+    padding-bottom: var(--p2);
+  }
+
+  table.kalendarzyk th {
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--tekst-2);
+    padding-bottom: var(--p1);
+  }
+
+  table.kalendarzyk td {
+    position: relative;
+    height: 34px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: var(--t2);
+    border-radius: var(--p1);
+    color: var(--tekst);
+  }
+
+  table.kalendarzyk td.poza { color: var(--tekst-2); opacity: 0.45; }
+
+  /* Dzień wolny czerwienią, przerwa szkolna spokojnym tłem. Barwa jest tylko
+     dodatkiem: pełny opis siedzi w title i aria-label każdej komórki. */
+  table.kalendarzyk td.wolny { background: var(--blad-tlo); color: var(--blad-tekst); }
+  table.kalendarzyk td.szkolny { background: var(--uwaga-tlo); color: var(--uwaga-tekst); }
+
+  /* Mostek: kropkowane podkreślenie, żeby odróżniał się bez własnej barwy. */
+  table.kalendarzyk td.mostek .liczba {
+    border-bottom: 2px dotted var(--uwaga-tekst);
+  }
+
+  table.kalendarzyk td.wybrany {
+    outline: 2px solid var(--akcent);
+    outline-offset: -2px;
+    font-weight: var(--g-naglowek);
+  }
+
+  table.kalendarzyk .kropka {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1px;
+    font-size: var(--t1);
+    line-height: 1;
+    color: var(--akcent);
+  }
+
+  .legenda {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--p1) var(--p3);
+    font-size: var(--t2);
+    color: var(--tekst-2);
+    margin: 0 0 var(--p3);
+  }
+
+  .probka {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    vertical-align: -2px;
+    margin-right: 2px;
+  }
+
+  .probka.wolny { background: var(--blad-tlo); border: 1px solid var(--blad-ramka); }
+  .probka.szkolny { background: var(--uwaga-tlo); border: 1px solid var(--uwaga-ramka); }
+  .probka.mostek {
+    background: none;
+    border-radius: 0;
+    height: 8px;
+    border-bottom: 2px dotted var(--uwaga-tekst);
+  }
+  .probka.kropka { width: auto; height: auto; color: var(--akcent); }
+
+  /* Etap nad grupą narzędzi w panelu bocznym; ten sam podział co przy dodatkach. */
+  .etap-narzedzi {
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tekst-2);
+    margin: var(--p4) 0 var(--p2);
+  }
+
+  .etap-narzedzi:first-of-type { margin-top: 0; }
+
+  ul.lista li.grupa-etapu .nazwa {
+    display: block;
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tekst-2);
+  }
 
   /* Akcja przy pozycji listy, na przykład „Dokończ” przy posiedzeniu. */
   ul.lista .akcja {
@@ -766,8 +1062,8 @@
     border: none;
     padding: 0;
     min-height: 0;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: var(--t2);
+    font-weight: var(--g-etykieta);
     color: var(--akcent);
     cursor: pointer;
     text-decoration: underline;
@@ -775,15 +1071,15 @@
 
   .plakietka {
     display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: var(--t1);
+    font-weight: var(--g-naglowek);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     background: var(--uwaga-tlo);
     color: var(--uwaga-tekst);
     border: 1px solid var(--uwaga-ramka);
     border-radius: var(--p1);
-    padding: 1px 6px;
+    padding: 1px var(--p2);
     margin-right: var(--p2);
   }
 
@@ -801,14 +1097,17 @@
   }
 
   /* Pozycja listy bez odnośnika — stan cyklu statutowego. */
-  ul.lista .nazwa { font-weight: 600; }
+  ul.lista .nazwa { font-weight: var(--g-etykieta); }
 
   .pusto {
     color: var(--tekst-2);
-    font-size: 0.86rem;
+    font-size: var(--t3);
     margin: 0;
     padding: var(--p2) 0;
   }
+
+  /* Formularz przed wczytaniem konfiguracji: przygaszony i nieklikalny. */
+  form[aria-busy="true"] { opacity: 0.6; pointer-events: none; }
 
   /* Placeholder na czas wczytywania listy — pokazuje, że coś się dzieje. */
   .szkielet {
@@ -826,7 +1125,7 @@
 
   .stopka {
     color: var(--tekst-2);
-    font-size: 0.8rem;
+    font-size: var(--t2);
     line-height: 1.6;
     text-align: center;
     margin: var(--p5) 0 0;
@@ -854,8 +1153,8 @@
     border: 1px solid var(--akcent);
     border-radius: var(--zaokraglenie-male);
     padding: var(--p2) var(--p3);
-    font-size: 0.86rem;
-    font-weight: 600;
+    font-size: var(--t3);
+    font-weight: var(--g-etykieta);
     z-index: 10;
   }
   .pomin:focus { left: var(--p4); }
@@ -863,8 +1162,7 @@
 
 <a class="pomin" href="#formularz">Przejdź do formularza</a>
 
-<div class="strona">
-
+<div class="belka">
   <header class="blankiet">
     <svg xmlns="http://www.w3.org/2000/svg" class="logo" role="img" aria-label="Polski Związek Wędkarski" viewBox="0 0 185.004 80"><g transform="translate(-256 -298)"><text transform="translate(360.004 328)" fill="#fff" font-size="13" font-family="Helvetica-Bold, Helvetica" font-weight="700"><tspan x="0" y="0">POLSKI</tspan><tspan x="0" y="16">ZWIĄZEK</tspan><tspan x="0" y="32">WĘDKARSKI</tspan></text><g transform="translate(256.004 298)"><rect width="83.673" height="79.963" fill="none"/><path d="M6.67,0h.7L8,.141l.631.141L9.26.49l.556.283.565.283.49.424.49.424.424.565.424.49.349.565.283.556.207.631.141.631.066.631V7.3l-.066.7-.141.631-.207.565-.283.565-.349.565-.424.49-.424.565-.49.424-.49.424-.565.283-.556.283L8.629,13,8,13.142l-.631.141h-1.4l-.631-.141L4.7,13l-.631-.207L3.5,12.511l-.565-.283-.49-.424-.49-.424-.424-.565-.424-.49L.763,9.76.48,9.195.273,8.629.132,8,.066,7.3,0,6.67l.066-.7.066-.631L.273,4.71.48,4.079l.283-.556.349-.565.424-.49L1.959,1.9l.49-.424.49-.424L3.5.772,4.07.49,4.7.283,5.332.141,5.963,0h.7Zm5.747,6.651L12.35,6.02l-.066-.565-.141-.49L12,4.4l-.283-.49-.283-.49L11.088,3l-.349-.424-.424-.424L9.826,1.8,9.4,1.517l-.556-.207L8.356,1.1,7.791.961,7.235.895H6.048L5.483.961l-.49.141-.565.207-.49.207-.49.283-.424.349L2.6,2.572,2.252,3,1.9,3.42l-.283.49-.283.49L1.2,4.965l-.141.49L.989,6.02l-.066.631.066.565.066.565.141.565.141.49.283.49.283.49.349.424.349.424.424.424.424.349.49.283.49.207.565.207.49.141.565.066H7.235l.556-.066.565-.141.49-.207.556-.207.424-.283.49-.349.424-.424.349-.424.349-.424.283-.49L12,8.837l.141-.49.141-.565.066-.565Zm-8.055,3.5V3.081H6.952l.207.066h.207l.141.066h.207l.207.141.141.066.141.141.207.141.141.141.066.141.141.207.066.141.066.207v.207l.066.141v.424l-.066.207v.207l-.066.207-.066.141-.141.207-.141.141-.141.141-.283.283-.141.066-.207.066.631,1.545.631,1.611H7.706l-.565-1.47L6.51,7.2H5.389v2.939H4.333Zm3.57-5.049V4.965l-.066-.207L7.8,4.616l-.141-.207-.141-.066L7.31,4.2l-.141-.066H5.417V6.171H6.962L7.169,6.1H7.31l.207-.141L7.659,5.9,7.8,5.69l.075-.141.066-.207V5.134" transform="translate(4.242 66.717)" fill="#fff" fill-rule="evenodd"/><path d="M13.272,2.252A110.875,110.875,0,0,1,24.157,8.045,106.7,106.7,0,0,1,37.1,17.494c10.057-.236,14.6,1.008,20.942,2.1a24.386,24.386,0,0,0-.085,4.051c.132.5.235,1.168.377,1.667l.377.923a9.027,9.027,0,0,1,1.149,2.751c-.33.33-.734.3-1.874.386a1.914,1.914,0,0,0,0,1.036A19.344,19.344,0,0,0,65.72,32.1c11.554.311,11.215-10.344,16.168-16.731.829-.942,1.431-1.008,1.789-.961a30.692,30.692,0,0,1-.508,6.689l-2.608,3.665c-1.224,1.762-.4,1.14,1.252.97.245.782-.132,2.732-1.2,5.36-2.222,5.568-3.107,7.169-6.61,10.334a18.666,18.666,0,0,1-10.885,5.5c-2.363.028-5.2-.038-8.974.32a4.5,4.5,0,0,1-1.026-1.818c0-.33-.829-.226-1.055-.226-.819.236,2.006,4.691,2.053,6.519a11.441,11.441,0,0,1-2.665-.009c-3.154-2.779-6.045-4.87-8.371-6.821-2.4-2.129-2.881-2.233-6.13-2.572-2.589-.415-6.62-3.552-8.541-3.5-.056-.942-.226-2.157-.2-2.883-.9,0-1.591-.113-1.591-.075,0,.33.056,3.335.113,4.955-.273-.217-1.4-.339-1.921-1.187a32.325,32.325,0,0,1-6-6.726c-.245-.82-.339-2.544-.584-3.957-2.288-2.167-4.6-3.42-6.6-5.087C5.315,18.935,2.387,13.6.381,7.216c-1.234-4.023.838-9.091,1.817-3.4,1.318,1.272,1.742,2.449,2.5,4.512a30.05,30.05,0,0,0,1.9,3.891c.226.669,1.008-2.553-.226-5.276-.885-2.12-3.927-5.558-3.654-6.5A2.051,2.051,0,0,1,3.922,0a30.824,30.824,0,0,1,9.332,2.261ZM6.577,3.42a16.4,16.4,0,0,1,2.571,7.555c.48,1.818-.264,4.663.96,5.247,2.514.217,2.787-1.451,2.674-2.892A9.392,9.392,0,0,0,11.925,9.9c-.8-1.234-1.6-3-2.09-3.693L8.5,4.39C8.178,3.966,7.641,3.156,7.161,3c-.8-.273-.96.537-.593.424Zm7.815,7.367A2.469,2.469,0,1,0,16.86,8.4a2.429,2.429,0,0,0-2.467,2.383Zm-.424,9.26a8.676,8.676,0,0,0,7.053-.7,6.79,6.79,0,0,0,3.889-3.938c.217-2.666-2.147.772-2.966,1.253a9.565,9.565,0,0,1-3.654,1.244c-2.241.386-6.139-1.4-5.763.594a2.824,2.824,0,0,0,1.441,1.536ZM28.018,23.8l.367,2.572-2.4.32.2,1.47,2.42-.32.348,2.449,1.469-.207-.339-2.44,2.411-.32-.2-1.47-2.42.32-.367-2.591-1.469.207Zm6.93,5.389.734,2.5-2.335.669.4,1.423L36.1,33.1l.7,2.374,1.422-.415-.7-2.365,2.335-.669-.4-1.423-2.345.669-.734-2.506-1.422.415Zm5.932,4.352.913,2.44-2.279.838.508,1.394,2.288-.838.866,2.317,1.384-.518L43.7,36.863l2.279-.838-.508-1.394-2.3.838-.923-2.449-1.384.518Zm6.422,3.58,1.5,1.667-1.563,1.385.847.951,1.563-1.385,1.422,1.583.951-.848L50.607,38.9l1.563-1.385-.847-.951-1.573,1.394-1.5-1.667-.942.848Zm6.78,1.818,1.139,1.46-1.365,1.055.64.838,1.375-1.055,1.083,1.385.829-.65-1.073-1.385,1.365-1.055-.64-.838-1.375,1.055-1.139-1.46-.829.65Zm6.158.565,1.412,1.187L60.532,42l.8.688,1.121-1.319L63.8,42.5l.678-.8-1.337-1.13,1.121-1.319-.8-.678-1.13,1.319-1.422-1.2-.678.81" transform="translate(-0.004 27.236)" fill="#fff" fill-rule="evenodd"/><path d="M0,29c1.526-4.786,3.184-9.722,4.691-14.574S7.81,4.772,9.421.014c.961.019,1.884.038,2.836.019A43.52,43.52,0,0,1,16.693.08c2.5.226,4.39,1.62,4.541,4.315a8.13,8.13,0,0,1-.188,2.327l-.292,1.5c-.716,3.241-1.771,5.747-2.788,8.912-1.017,3.128-3.335,4.626-5.935,4.437L6.868,21.54,4.239,28.973l-4.22.019ZM12.124,4.244,7.942,17.169h3.646a5.286,5.286,0,0,0,.546,0l.264-.028.207-.028a1.434,1.434,0,0,0,.716-.433h.019l.019-.038a1.284,1.284,0,0,0,.1-.132,2.132,2.132,0,0,0,.245-.4l.132-.2.367-.829.678-2.035.82-2.478.688-2.506.424-1.6.057-.254L16.9,6a1.385,1.385,0,0,0-.876-1.743c-.33-.009-.707-.019-1.046-.019H12.134" transform="translate(25.89 6.156)" fill="#fff" fill-rule="evenodd"/><path d="M6.962,37.88l21.13.019-2.2,4L0,41.978,12.6,19.8l.49-13.481,3.881-.028-.151,6.01,4.626-8.1H7.094L8.8,0h19.52L16.552,20.886l-.075,4.437L27.32,6.331l4.465-.085-1.7,19.048L39.058,6.3l4.814-.085L29.9,35.308l-4.512-.019,1.79-20.151L16.024,35.327l-3.9.009.254-7.056Z" transform="translate(35.375)" fill="#fff" fill-rule="evenodd"/><path d="M14.508,1.131l2.412,9.185a17.284,17.284,0,0,1,.339,5.709A65.033,65.033,0,0,0,18.5,27.481c-2.487,1.733-4.428,5.4-5.332,8.215-1.894,4.484-2.864,5.841-5.341,8.036-2.186.961-5.285.659-4.654.349,1.159-1.488,3.486-4.644,4.965-6.491.97-1.6.791.584,2.534-.528,1.168-4.494-3.467-7.81-6.849-8.865a9.072,9.072,0,0,0-1.507-.019C1.2,28.319.132,29.412.01,28.885a8.027,8.027,0,0,1,1.14-3.071l1.46-2.289,2.967-4.079c2.638-3.523,5.031-7,5.831-11.258l1.488-5.8C13.472-.668,13.9-.442,14.508,1.122" transform="translate(63.438 12.657)" fill="#fff" fill-rule="evenodd"/></g></g></svg>
     <div class="blankiet-tresc">
@@ -873,6 +1171,9 @@
     </div>
     <p class="teleadres" id="teleadres"></p>
   </header>
+</div>
+
+<div class="strona">
 
   <!-- ── Terminy statutowe ─────────────────────────────────────────────────
        Pas na pełną szerokość, nad pracą. To jedyna rzecz, której użytkownik
@@ -951,6 +1252,33 @@
           </p>
 
           <p class="wskazowka" id="zrodlo-podpowiedzi" hidden></p>
+
+          <!-- Sąsiedztwo terminu, tuż pod datą: co wypada w okolicy, zanim
+               data zostanie zaklepana. -->
+          <section class="otoczenie" id="otoczenie"
+                   aria-labelledby="etykieta-otoczenia">
+            <h3 id="etykieta-otoczenia">Kalendarz</h3>
+
+            <div class="nawigacja-miesiaca">
+              <button type="button" class="drugi krok" id="miesiac-wstecz"
+                      aria-label="Poprzedni miesiąc">‹</button>
+              <strong id="miesiac-nazwa" aria-live="polite"></strong>
+              <button type="button" class="drugi krok" id="miesiac-naprzod"
+                      aria-label="Następny miesiąc">›</button>
+            </div>
+
+            <div id="siatka-kalendarza"></div>
+            <p class="legenda" aria-hidden="true">
+              <span class="probka wolny"></span> dzień wolny
+              <span class="probka szkolny"></span> przerwa w szkołach
+              <span class="probka mostek"></span> mostek
+              <span class="probka kropka">•</span> wpis w kalendarzu
+            </p>
+            <ul class="lista" id="lista-otoczenia"></ul>
+            <p class="pusto" id="brak-otoczenia" hidden>
+              W promieniu dziesięciu dni nic nie koliduje.
+            </p>
+          </section>
 
           <div class="pole">
             <label for="miejsce">Miejsce obrad <span class="dodatek">— opcjonalnie</span></label>
@@ -1062,15 +1390,15 @@
         </div>
         <section id="sekcja-dodatkow" aria-labelledby="etykieta-dodatkow" hidden>
           <div class="pasek">
-            <h3 id="etykieta-dodatkow">Dodatki</h3>
+            <h3 id="etykieta-dodatkow">Co jeszcze można dodać</h3>
             <button type="button" class="drugi" id="przycisk-dodatki"
-                    aria-describedby="etykieta-dodatkow">Dopnij zaznaczone</button>
+                    aria-describedby="etykieta-dodatkow">Utwórz zaznaczone</button>
           </div>
           <ul class="lista" id="lista-dodatkow"></ul>
           <p class="wskazowka">
             Posiedzenie jest już zwołane i nic z tej listy nie jest do tego
             potrzebne. Możesz dopiąć te rzeczy teraz albo później, przyciskiem
-            „Dokończ” przy posiedzeniu na liście najbliższych.
+            „Uzupełnij” przy posiedzeniu na liście najbliższych.
           </p>
         </section>
 
@@ -1157,6 +1485,8 @@
       <section class="karta zwarta" aria-labelledby="tytul-narzedzi">
         <h2 class="tytul-boczny" id="tytul-narzedzi">Narzędzia</h2>
 
+        <p class="etap-narzedzi">Zanim zwołasz</p>
+
         <details id="szczegoly-planu">
           <summary>Plan roczny</summary>
           <div class="tresc-zwijana">
@@ -1187,6 +1517,37 @@
             </button>
           </div>
         </details>
+
+        <details id="szczegoly-kalendarza">
+          <summary>Dni wolne i kalendarz szkolny</summary>
+          <div class="tresc-zwijana">
+            <p class="wskazowka">
+              Dni ustawowo wolne, dni mostkowe i kalendarz szkolny jako
+              całodniowe wpisy. Są przezroczyste, więc niczego nie blokują;
+              mają być widoczne, zanim wybierzesz datę posiedzenia.
+            </p>
+
+            <div class="pole">
+              <label for="kalendarz-rok">Rok</label>
+              <input type="number" id="kalendarz-rok" min="2026" max="2099" step="1">
+            </div>
+
+            <button type="button" class="drugi szeroki" id="przycisk-kalendarz-propozycja">
+              Pokaż propozycję
+            </button>
+
+            <ul class="lista" id="lista-kalendarza"></ul>
+
+            <button type="button" class="drugi szeroki" id="przycisk-kalendarz-zapis" hidden>
+              Wpisz zaznaczone do kalendarza
+            </button>
+            <button type="button" class="drugi szeroki" id="przycisk-kalendarz-usun" hidden>
+              Usuń te wpisy z kalendarza
+            </button>
+          </div>
+        </details>
+
+        <p class="etap-narzedzi">Po posiedzeniu</p>
 
         <details id="szczegoly-rejestru">
           <summary>
@@ -1267,6 +1628,9 @@
   /** Dane formularza zamrożone w chwili złożenia podglądu. */
   let danePodgladu = null;
 
+  /** Miesiąc oglądany w siatce; niekoniecznie ten z wybraną datą. */
+  let miesiacWidoczny = '';
+
   /** Wydarzenie utworzone przed chwilą — pod protokół. */
   let idOstatniegoWydarzenia = '';
 
@@ -1314,6 +1678,7 @@
       przygotujPrzypomnienia(dane.przypomnienia || {});
       przygotujPlan();
       przygotujRejestr();
+      przygotujKalendarz();
     } catch (blad) {
       pokazBlad(blad.message || String(blad));
     }
@@ -1328,7 +1693,11 @@
 
   function wyczyscFormularz() {
     el('data').value = '';
+    // Kalendarz zostaje widoczny; po wyczyszczeniu daty wraca do bieżącego
+    // miesiąca, a lista sąsiedztwa milknie, bo nie ma wobec czego jej liczyć.
+    miesiacWidoczny = '';
     zastosujRodzaj();
+    zaplanujOtoczenie();
   }
 
   /**
@@ -1535,8 +1904,224 @@
       : 'Do posiedzenia ' + dni + ' dni — wyprzedzenie zachowane.';
   }
 
+  // ── Otoczenie terminu ────────────────────────────────────────────────────
+
+  const ZNACZKI_OTOCZENIA = {
+    wolne: 'dzień wolny',
+    mostek: 'mostek',
+    szkolne: 'przerwa w szkołach',
+    posiedzenie: 'posiedzenie',
+    termin: 'termin',
+    zapowiedz: 'zapowiedź',
+  };
+
+  let zegarOtoczenia = null;
+
+  /** Data zmienia się przy każdym kliknięciu w kalendarzyku, więc czekamy chwilę. */
+  function zaplanujOtoczenie() {
+    clearTimeout(zegarOtoczenia);
+    zegarOtoczenia = setTimeout(odswiezOtoczenie, 350);
+  }
+
+  /**
+   * Kalendarz jest widoczny od początku, także zanim padnie wybór daty.
+   * Wtedy pokazuje bieżący miesiąc, a lista sąsiedztwa pozostaje pusta,
+   * bo nie ma jeszcze terminu, wobec którego coś mogłoby kolidować.
+   */
+  async function odswiezOtoczenie() {
+    const data = el('data').value;
+    const srodek = miesiacWidoczny || data || dzisiajISO();
+    const siatka = el('siatka-kalendarza');
+
+    // Bez tego przeskok miesiąca wygląda na zawieszenie: siatka stoi
+    // nieruchomo, dopóki nie wróci odpowiedź.
+    siatka.setAttribute('aria-busy', 'true');
+    siatka.classList.add('czeka');
+
+    try {
+      const wynik = await serwer('pobierzOtoczenieTerminu', srodek);
+
+      // Odpowiedź na starą datę potrafi wrócić po nowszej. Wtedy ją zostawiamy,
+      // bo inaczej kalendarz pokazywałby miesiąc, którego już nikt nie ogląda.
+      if (srodek !== (miesiacWidoczny || el('data').value || dzisiajISO())) {
+        return;
+      }
+
+      wypiszOtoczenie(wynik, Boolean(data));
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      siatka.removeAttribute('aria-busy');
+      siatka.classList.remove('czeka');
+    }
+  }
+
+  /**
+   * Siatka miesiąca. Barwa nie niesie treści sama: każdy dzień ma pełny opis
+   * w `title` i `aria-label`, a wybrany dzień dodatkowo `aria-current`.
+   */
+  function narysujSiatke(siatka) {
+    const gniazdo = el('siatka-kalendarza');
+
+    gniazdo.innerHTML = '';
+
+    if (!siatka) { return; }
+
+    const tabela = document.createElement('table');
+    tabela.className = 'kalendarzyk';
+
+    const glowa = document.createElement('thead');
+    const wiersz = document.createElement('tr');
+
+    siatka.dni.forEach(function (nazwa) {
+      const komorka = document.createElement('th');
+      komorka.scope = 'col';
+      komorka.textContent = nazwa;
+      wiersz.appendChild(komorka);
+    });
+
+    glowa.appendChild(wiersz);
+    tabela.appendChild(glowa);
+
+    const cialo = document.createElement('tbody');
+
+    siatka.tygodnie.forEach(function (tydzien) {
+      const rzad = document.createElement('tr');
+
+      tydzien.forEach(function (dzien) {
+        rzad.appendChild(komorkaDnia(dzien));
+      });
+
+      cialo.appendChild(rzad);
+    });
+
+    tabela.appendChild(cialo);
+    gniazdo.appendChild(tabela);
+  }
+
+  function komorkaDnia(dzien) {
+    const komorka = document.createElement('td');
+    const klasy = ['dzien'];
+
+    if (dzien.poza) { klasy.push('poza'); }
+    if (dzien.wolne) { klasy.push('wolny'); }
+    if (dzien.szkolne) { klasy.push('szkolny'); }
+    if (dzien.mostek) { klasy.push('mostek'); }
+    if (dzien.wybrany && el('data').value) { klasy.push('wybrany'); }
+
+    komorka.className = klasy.join(' ');
+
+    // Dzień jest przyciskiem: działa klawiatura, a czytnik ekranu ogłasza go
+    // jako element do kliknięcia, nie jako zwykłą komórkę tabeli.
+    const przycisk = document.createElement('button');
+    przycisk.type = 'button';
+    przycisk.title = dzien.opis;
+    przycisk.setAttribute('aria-label', dzien.opis);
+
+    if (dzien.wybrany && el('data').value) {
+      przycisk.setAttribute('aria-current', 'date');
+    }
+
+    const liczba = document.createElement('span');
+    liczba.className = 'liczba';
+    liczba.textContent = dzien.dzien;
+    przycisk.appendChild(liczba);
+
+    if (dzien.wydarzen) {
+      const kropka = document.createElement('span');
+      kropka.className = 'kropka';
+      kropka.setAttribute('aria-hidden', 'true');
+      kropka.textContent = dzien.wydarzen > 1 ? '••' : '•';
+      przycisk.appendChild(kropka);
+    }
+
+    przycisk.addEventListener('click', function () {
+      wybierzDzien(dzien.data);
+    });
+
+    komorka.appendChild(przycisk);
+    return komorka;
+  }
+
+  /** Kliknięcie w dzień wpisuje datę do formularza i przelicza resztę. */
+  function wybierzDzien(data) {
+    el('data').value = data;
+    miesiacWidoczny = data;
+
+    sprawdzWyprzedzenie();
+    zaplanujOtoczenie();
+  }
+
+  function przesunMiesiac(krok) {
+    const podstawa = miesiacWidoczny || el('data').value || dzisiajISO();
+    const czesci = podstawa.split('-').map(Number);
+    // Pierwszy dzień miesiąca, żeby przeskok nie gubił się na krótszych.
+    const cel = new Date(czesci[0], czesci[1] - 1 + krok, 1);
+
+    miesiacWidoczny = naISO(cel);
+    odswiezOtoczenie();
+  }
+
+  function dzisiajISO() {
+    return naISO(new Date());
+  }
+
+  function naISO(data) {
+    const dwie = (n) => String(n).padStart(2, '0');
+    return data.getFullYear() + '-' + dwie(data.getMonth() + 1) + '-' + dwie(data.getDate());
+  }
+
+  el('miesiac-wstecz').addEventListener('click', function () { przesunMiesiac(-1); });
+  el('miesiac-naprzod').addEventListener('click', function () { przesunMiesiac(1); });
+
+  function wypiszOtoczenie(otoczenie, jestData) {
+    const lista = el('lista-otoczenia');
+    // Bez wybranej daty nie ma wobec czego szukać kolizji, więc lista milczy.
+    const pozycje = jestData ? (otoczenie.pozycje || []) : [];
+
+    narysujSiatke(otoczenie.siatka);
+    el('miesiac-nazwa').textContent = (otoczenie.siatka || {}).naglowek || '';
+
+    lista.innerHTML = '';
+    el('brak-otoczenia').hidden = pozycje.length > 0 || !jestData;
+
+    pozycje.forEach(function (pozycja) {
+      const wiersz = document.createElement('li');
+
+      if (pozycja.odleglosc === 0) {
+        wiersz.className = 'ten-dzien';
+      }
+
+      const kiedy = document.createElement('span');
+      kiedy.className = 'kiedy';
+      kiedy.textContent = pozycja.kiedy;
+      wiersz.appendChild(kiedy);
+
+      const znaczek = ZNACZKI_OTOCZENIA[pozycja.rodzaj];
+
+      if (znaczek) {
+        const plakietka = document.createElement('span');
+        plakietka.className = 'plakietka' +
+          (pozycja.rodzaj === 'wolne' ? ' pilne' : ' spokojna');
+        plakietka.textContent = znaczek;
+        wiersz.appendChild(plakietka);
+      }
+
+      const nazwa = document.createElement('span');
+      nazwa.className = 'nazwa';
+      nazwa.textContent = pozycja.godzina
+        ? pozycja.nazwa + ', godz. ' + pozycja.godzina
+        : pozycja.nazwa;
+      wiersz.appendChild(nazwa);
+
+      lista.appendChild(wiersz);
+    });
+  }
+
   el('rodzaj').addEventListener('change', zastosujRodzaj);
   el('data').addEventListener('change', sprawdzWyprzedzenie);
+  el('data').addEventListener('change', zaplanujOtoczenie);
+  el('data').addEventListener('input', zaplanujOtoczenie);
   el('porzadek').addEventListener('input', policzPunkty);
 
   /** Wszystko, co formularz ma do powiedzenia serwerowi. */
@@ -1852,6 +2437,17 @@
     return pozycja;
   }
 
+  /** Przeniesienie z pasa terminów do formularza, z ustawionym rodzajem. */
+  function zwolajZTerminu(idRodzaju) {
+    el('rodzaj').value = idRodzaju;
+    zastosujRodzaj();
+
+    el('widok-wyniku').hidden = true;
+    el('widok-formularza').hidden = false;
+    el('formularz').scrollIntoView({ block: 'start', behavior: 'smooth' });
+    el('data').focus();
+  }
+
   /** Licznik przy nagłówku karty bocznej; zero chowamy, bo i tak jest pustostan. */
   function ustawLiczbe(id, ile) {
     const znacznik = el(id);
@@ -1959,8 +2555,22 @@
 
     if (!sa) { return; }
 
-    dodatki.forEach(function (dodatek) {
-      lista.appendChild(pozycjaDodatku(dodatek));
+    // Nie wszystko przydaje się naraz, więc lista idzie w kolejności
+    // przed → na posiedzenie → po. Puste etapy pomijamy.
+    (domyslne.etapy || [{ id: '', nazwa: '', opis: '' }]).forEach(function (etap) {
+      const swoje = dodatki.filter(function (dodatek) {
+        return !etap.id || dodatek.etap === etap.id;
+      });
+
+      if (!swoje.length) { return; }
+
+      if (etap.nazwa) {
+        lista.appendChild(naglowekEtapu(etap));
+      }
+
+      swoje.forEach(function (dodatek) {
+        lista.appendChild(pozycjaDodatku(dodatek));
+      });
     });
 
     // Zaznaczone domyślnie lecą od razu. Reszta czeka na przycisk.
@@ -1968,6 +2578,25 @@
       return d.domyslnie && d.stan !== 'gotowe';
     }).map(function (d) { return d.id; }));
   }
+
+  /** Śródtytuł etapu na liście dodatków. */
+  function naglowekEtapu(etap) {
+    const pozycja = document.createElement('li');
+    pozycja.className = 'grupa-etapu';
+
+    const nazwa = document.createElement('span');
+    nazwa.className = 'nazwa';
+    nazwa.textContent = etap.nazwa;
+    pozycja.appendChild(nazwa);
+
+    const opis = document.createElement('span');
+    opis.className = 'opis';
+    opis.textContent = etap.opis;
+    pozycja.appendChild(opis);
+
+    return pozycja;
+  }
+
 
   /** Wiersz dodatku: pole wyboru, nazwa, opis i stan. */
   function pozycjaDodatku(dodatek) {
@@ -2051,7 +2680,7 @@
 
     przycisk.type = 'button';
     przycisk.className = 'akcja';
-    przycisk.textContent = 'Dokończ';
+    przycisk.textContent = 'Uzupełnij';
     przycisk.addEventListener('click', function () {
       pokazDokonczenie(posiedzenie);
     });
@@ -2183,30 +2812,29 @@
     return Math.min(1, Math.max(0, (dzis - od) / (do_ - od)));
   }
 
-  /** Wiersz wskaźnika: nazwa organu, pasek cyklu, stan słowem. */
+  /** Wiersz wskaźnika: nazwa i stan, pod spodem pasek, na końcu daty. */
   function pozycjaStanu(stan) {
     const pozycja = document.createElement('li');
     pozycja.dataset.stan = stan.stan;
 
+    const wiersz = document.createElement('div');
+    wiersz.className = 'wiersz';
+
     const organ = document.createElement('span');
     organ.className = 'organ';
     organ.textContent = stan.nazwa;
+    wiersz.appendChild(organ);
 
-    if (stan.cykl) {
-      const cykl = document.createElement('span');
-      cykl.className = 'cykl';
-      cykl.textContent = 'co ' + stan.cykl;
-      organ.appendChild(cykl);
-    }
+    const etykieta = document.createElement('span');
+    etykieta.className = 'etykieta';
+    etykieta.textContent = ETYKIETY_STANU[stan.stan] || 'w terminie';
+    wiersz.appendChild(etykieta);
 
-    pozycja.appendChild(organ);
+    pozycja.appendChild(wiersz);
 
     const udzial = udzialCyklu(stan);
 
-    if (udzial === null) {
-      // Bez dat pasek byłby zmyśleniem; zostaje pusty odstęp.
-      pozycja.appendChild(document.createElement('span'));
-    } else {
+    if (udzial !== null) {
       const tor = document.createElement('span');
       tor.className = 'tor';
       tor.setAttribute('role', 'img');
@@ -2221,19 +2849,39 @@
       pozycja.appendChild(tor);
     }
 
-    const opis = document.createElement('span');
-    opis.className = 'stan';
+    // Wiersz jest przyciskiem: mówi, że termin minął, więc ma pozwolić
+    // od razu zwołać to gremium, a nie zostawiać użytkownika z informacją.
+    if (rodzaje.some(function (r) { return r.id === stan.rodzaj; })) {
+      pozycja.classList.add('klikalny');
+      wiersz.setAttribute('role', 'button');
+      wiersz.tabIndex = 0;
+      wiersz.setAttribute('aria-label',
+        'Zwołaj: ' + stan.nazwa + '. ' + stan.zdanie);
 
-    const etykieta = ETYKIETY_STANU[stan.stan];
-    if (etykieta) {
-      const nazwaStanu = document.createElement('span');
-      nazwaStanu.className = 'etykieta';
-      nazwaStanu.textContent = etykieta;
-      opis.appendChild(nazwaStanu);
+      const zwolaj = function () { zwolajZTerminu(stan.rodzaj); };
+      wiersz.addEventListener('click', zwolaj);
+      wiersz.addEventListener('keydown', function (zdarzenie) {
+        if (zdarzenie.key === 'Enter' || zdarzenie.key === ' ') {
+          zdarzenie.preventDefault();
+          zwolaj();
+        }
+      });
     }
 
-    opis.appendChild(document.createTextNode(stan.zdanie));
-    pozycja.appendChild(opis);
+    const daty = document.createElement('div');
+    daty.className = 'daty';
+
+    const cykl = document.createElement('span');
+    cykl.textContent = stan.ostatnie
+      ? 'co ' + stan.cykl + ' · ostatnie ' + stan.ostatnie
+      : 'co ' + stan.cykl;
+    daty.appendChild(cykl);
+
+    const termin = document.createElement('span');
+    termin.textContent = stan.zdanie;
+    daty.appendChild(termin);
+
+    pozycja.appendChild(daty);
 
     return pozycja;
   }
@@ -2250,8 +2898,8 @@
     if (!stan.dostepne) { return; }
 
     przycisk.textContent = stan.zainstalowany
-      ? 'Wyłącz przypomnienia D-1'
-      : 'Włącz przypomnienia D-1';
+      ? 'Wyłącz przypomnienia dzień wcześniej'
+      : 'Włącz przypomnienia dzień wcześniej';
 
     wskazowka.textContent = stan.zainstalowany
       ? 'Codziennie o ' + stan.godzina + ':00 narzędzie przygotuje w Gmailu ' +
@@ -2329,6 +2977,17 @@
     if (!el('zmiana-data').value) {
       pokazBlad('Podaj nową datę posiedzenia.');
       el('zmiana-data').focus();
+      return;
+    }
+
+    const wybrane = lista.options[lista.selectedIndex];
+    const nowa = new Date(el('zmiana-data').value + 'T00:00:00')
+      .toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Termin był już rozesłany, więc przesunięcie dotyka ludzi poza aplikacją.
+    if (!confirm('Przenieść „' + (wybrane ? wybrane.textContent.trim() : 'posiedzenie') +
+                 '” na ' + nowa + '?\n\nUczestnicy dostali już zawiadomienie ' +
+                 'ze starym terminem; o zmianie trzeba ich powiadomić osobno.')) {
       return;
     }
 
@@ -2543,6 +3202,126 @@
     } finally {
       przycisk.disabled = false;
       przycisk.removeAttribute('aria-busy');
+    }
+  });
+
+  // ── Tło kalendarza ───────────────────────────────────────────────────────
+
+  function przygotujKalendarz() {
+    el('kalendarz-rok').value = new Date().getFullYear();
+  }
+
+  el('przycisk-kalendarz-propozycja').addEventListener('click', async function () {
+    const przycisk = this;
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+
+    try {
+      wypiszKalendarz(await serwer('zaproponujKalendarzRoku', el('kalendarz-rok').value));
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+    }
+  });
+
+  function wypiszKalendarz(propozycja) {
+    const lista = el('lista-kalendarza');
+    let ile = 0;
+
+    lista.innerHTML = '';
+
+    propozycja.grupy.forEach(function (grupa) {
+      if (!grupa.wpisy.length) { return; }
+
+      lista.appendChild(naglowekEtapu({ nazwa: grupa.nazwa, opis: grupa.opis }));
+
+      grupa.wpisy.forEach(function (wpis) {
+        lista.appendChild(pozycjaKalendarza(wpis));
+        ile++;
+      });
+    });
+
+    el('przycisk-kalendarz-zapis').hidden = ile === 0;
+    el('przycisk-kalendarz-usun').hidden = false;
+  }
+
+  function pozycjaKalendarza(wpis) {
+    const pozycja = document.createElement('li');
+    const etykieta = document.createElement('label');
+    etykieta.className = 'dodatek';
+
+    const pole = document.createElement('input');
+    pole.type = 'checkbox';
+    pole.checked = wpis.wybrany;
+    pole.dataset.wpis = JSON.stringify(wpis);
+    etykieta.appendChild(pole);
+
+    const nazwa = document.createElement('span');
+    nazwa.className = 'nazwa';
+    nazwa.textContent = wpis.nazwa;
+    etykieta.appendChild(nazwa);
+
+    pozycja.appendChild(etykieta);
+
+    const opis = document.createElement('span');
+    opis.className = 'opis';
+    opis.textContent = wpis.uwaga ? wpis.opis + ' · ' + wpis.uwaga : wpis.opis;
+    pozycja.appendChild(opis);
+
+    return pozycja;
+  }
+
+  el('przycisk-kalendarz-zapis').addEventListener('click', async function () {
+    const przycisk = this;
+    const wpisy = Array.prototype.slice
+      .call(el('lista-kalendarza').querySelectorAll('input:checked'))
+      .map(function (pole) { return JSON.parse(pole.dataset.wpis); });
+
+    if (!wpisy.length) {
+      pokazBlad('Zaznacz przynajmniej jedną pozycję.');
+      return;
+    }
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+
+    try {
+      const wynik = await serwer('utworzKalendarzRoku', { wpisy: wpisy });
+
+      el('lista-kalendarza').innerHTML = '';
+      przycisk.hidden = true;
+      wypiszUwagi('uwagi', 'uwagi-lista', [wynik.komunikat]);
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+    }
+  });
+
+  el('przycisk-kalendarz-usun').addEventListener('click', async function () {
+    const przycisk = this;
+    const rok = el('kalendarz-rok').value;
+
+    if (!window.confirm('Usunąć wpisy dni wolnych i kalendarza szkolnego na rok ' + rok + '?')) {
+      return;
+    }
+
+    schowajBlad();
+    przycisk.disabled = true;
+
+    try {
+      const wynik = await serwer('usunKalendarzRoku', rok);
+      wypiszUwagi('uwagi', 'uwagi-lista', [wynik.komunikat]);
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
     }
   });
 

@@ -80,6 +80,7 @@ function pobierzDomyslne() {
     liczbaAdresatow: (KONFIG.adresyDoWysylki || []).length,
     zwolujacy: pobierzZwolujacych(),
     rejestrUchwal: Boolean(KONFIG.rejestrUchwal),
+    etapy: pobierzEtapy(),
     preferowanyDzienTygodnia: KONFIG.preferowanyDzienTygodnia,
     ktoryTydzienMiesiaca: KONFIG.ktoryTydzienMiesiaca,
     przypomnienia: stanPrzypomnien(),
@@ -576,7 +577,7 @@ function wstawPrzypomnienieOCyklu_(rodzaj, start) {
   Calendar.Events.insert({
     summary: 'Upływa termin: ' + rodzaj.nazwa,
     description:
-      'Statut PZW wymaga, aby to gremium zbierało się ' +
+      'Statut PZW wymaga, aby ten organ zbierał się ' +
       rodzaj.czestotliwosc.charAt(0).toLowerCase() + rodzaj.czestotliwosc.slice(1) +
       '\n\nPoprzednie posiedzenie: ' + sformatujDate_(start) +
       '\nZwołuje: ' + rodzaj.zwoluje +
@@ -689,9 +690,7 @@ function zlozZaproszenie_(rodzaj, start, drugiStart, linkMeet, miejsce, porzadek
   wiersze.push(zwrotPowitalnyRodzaju_(rodzaj));
   wiersze.push('');
 
-  const zwolanie = rodzaj.zdanieZwolania
-    .replace('{okreg}', KONFIG.okreg.nazwa)
-    .replace('{okregu}', KONFIG.okreg.nazwaDopelniaczKrotka) +
+  const zwolanie = zdanieZwolania_(rodzaj, idZwolujacego) +
     ' ' + DNI_W_ZDANIU[start.getDay()] + ', ' + sformatujDate_(start);
 
   if (drugiStart) {
@@ -788,6 +787,35 @@ function naHtml_(tekst) {
 
   return '<div style="font-family: Arial, Helvetica, sans-serif; ' +
     'font-size: 14px; line-height: 1.6; color: #131c28;">' + tresc + '</div>';
+}
+
+
+/**
+ * Zdanie otwierające zawiadomienie.
+ *
+ * Posiedzenia Zarządu Okręgu i Prezydium zwołuje prezes albo osoba przez
+ * niego upoważniona (§ 46 ust. 2, § 48 ust. 4). Gdy podpisuje ktoś inny niż
+ * prezes, zawiadomienie musi powiedzieć, że działa z upoważnienia; bez tego
+ * czytelnik nie wie, czy zwołanie jest skuteczne.
+ */
+function zdanieZwolania_(rodzaj, idZwolujacego) {
+  const zdanie = rodzaj.zdanieZwolania
+    .replace('{okreg}', KONFIG.okreg.nazwa)
+    .replace('{okregu}', KONFIG.okreg.nazwaDopelniaczKrotka);
+
+  if (!rodzaj.upowaznieniePrezesa) {
+    return zdanie;
+  }
+
+  const osoba = zwolujacyLubDomyslny_(idZwolujacego, rodzaj);
+
+  if (!osoba || czyPrezes_(osoba)) {
+    return zdanie;
+  }
+
+  // Duża litera przenosi się na początek dopisku.
+  return 'z upoważnienia Prezesa Zarządu ' + KONFIG.okreg.nazwaDopelniaczKrotka +
+    ' ' + zdanie;
 }
 
 

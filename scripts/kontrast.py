@@ -30,7 +30,6 @@ PARY = [
     ('--akcent',       '--tlo',     4.5, 'nagłówek marki'),
     ('--akcent',       '--karta-2', 4.5, 'odnośnik w sekcji zwijanej'),
     ('--akcent',       '--karta-2', 4.5, 'odwołanie do paragrafu Statutu'),
-    ('--blekit',       '--karta-2', 3.0, 'krecha przy wymogach Statutu'),
     ('--blad-tekst',   '--blad-tlo', 4.5, 'komunikat błędu'),
     ('--uwaga-tekst',  '--uwaga-tlo', 4.5, 'komunikat ostrzeżenia'),
     ('--uwaga-tekst',  '--karta',   4.5, 'status „za późno” pod datą'),
@@ -49,16 +48,14 @@ PARY = [
 # Tekst na przycisku głównym: kolor wpisany wprost, nie ze zmiennej.
 PRZYCISK = [
     ('#ffffff', '--akcent', 4.5, 'napis na przycisku głównym (jasny)'),
-    ('#0d1826', '--akcent', 4.5, 'napis na przycisku głównym (ciemny)'),
+    ('--napis-na-akcencie', '--akcent', 4.5, 'napis na przycisku głównym (ciemny)'),
 ]
 
 # Blankiet ma własne, jasne barwy tekstu na granacie, też wpisane wprost.
 BLANKIET = [
     ('#ffffff', '--granat',   4.5, 'tytuł w blankiecie'),
-    ('#b9c6e6', '--granat',   4.5, 'nazwa jednostki w blankiecie'),
-    ('#b6c7e0', '--granat',   4.5, 'teleadres w blankiecie'),
-    ('#ffffff', '--granat-2', 4.5, 'tytuł na ciemniejszym końcu gradientu'),
-    ('#b6c7e0', '--granat-2', 4.5, 'teleadres na ciemniejszym końcu gradientu'),
+    ('--na-granacie', '--granat',   4.5, 'nazwa jednostki w blankiecie'),
+    ('--na-granacie-slaby', '--granat',   4.5, 'teleadres w blankiecie'),
     ('#93a6cf', '--granat',   4.5, 'nagłówek i opisy w bloku terminów'),
     ('#cddcf5', '--granat',   4.5, 'odnośniki w bloku terminów'),
     ('#dfe7f6', '--granat',   4.5, 'licznik zaległości'),
@@ -67,8 +64,20 @@ BLANKIET = [
 
 
 def zmienne(css: str, blok: str) -> dict:
-    """Wyciąga pary --nazwa: wartość z podanego fragmentu CSS."""
-    return dict(re.findall(r'(--[\w-]+):\s*(#[0-9a-fA-F]{3,8})\s*;', blok))
+    """Wyciąga pary --nazwa: wartość i rozwija odwołania var(--…).
+
+    Nazwy semantyczne wskazują na role Material 3, więc bez rozwinięcia
+    aliasów walidator nie zobaczyłby żadnej barwy.
+    """
+    pary = dict(re.findall(r'(--[\w-]+):\s*(#[0-9a-fA-F]{3,8})\s*;', blok))
+    aliasy = dict(re.findall(r'(--[\w-]+):\s*var\((--[\w-]+)\)\s*;', blok))
+
+    for _ in range(5):
+        for nazwa, cel in aliasy.items():
+            if nazwa not in pary and cel in pary:
+                pary[nazwa] = pary[cel]
+
+    return pary
 
 
 def podziel(css: str):

@@ -1,0 +1,8 @@
+# Śmieci systemu i edytora
+.DS_Store
+.idea/
+
+# Powiązanie z konkretnym projektem Apps Script; u każdego inne.
+# Tworzy je `clasp clone`, nie trzymamy go w repozytorium.
+.clasp.json
+.clasprc.json

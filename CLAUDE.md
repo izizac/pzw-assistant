@@ -41,6 +41,7 @@ formę zamiast kombinować z końcówkami.
 | `apps-script/Goscie.gs`       | goście wydarzenia, odpowiedzi RSVP, werdykt o kworum      |
 | `apps-script/Uchwaly.gs`      | rejestr uchwał w arkuszu, tryb § 48 ust. 2                |
 | `apps-script/Plan.gs`         | plan roczny posiedzeń jako zapowiedzi w kalendarzu        |
+| `apps-script/KalendarzPolski.gs` | tło roku: dni wolne, dni mostkowe, kalendarz szkolny   |
 | `apps-script/Terminarz.gs`    | cykl statutowy liczony z historii, wyzwalacz przypomnień D-1 |
 | `apps-script/Zmiany.gs`       | odwoływanie i przenoszenie zwołanych posiedzeń            |
 | `apps-script/Dokumenty.gs`    | szkielet protokołu w Dokumentach Google                   |
@@ -48,7 +49,7 @@ formę zamiast kombinować z końcówkami.
 | `apps-script/appsscript.json` | manifest: strefa czasowa, Calendar API, zakresy OAuth    |
 | `docs/`                       | wyciągi ze Statutu, fakty o Okręgu, sprawdzone linki      |
 | `scripts/`                    | `sprawdz.sh` (weryfikacja), `kontrast.py` (WCAG), `podglad.py` (zrzuty), `styl.py` (styl tekstu) |
-| `.claude/skills/`             | `rodzaj-posiedzenia`, `interfejs`, `przeglad-ui`, `napisy`, `polszczyzna`, `dane-osobowe`, `zrodla-pzw` |
+| `.claude/skills/`             | `system`, `rodzaj-posiedzenia`, `interfejs`, `przeglad-ui`, `napisy`, `polszczyzna`, `dane-osobowe`, `zrodla-pzw` |
 
 Nazwa pliku HTML musi być `Index` — `doGet()` woła
 `HtmlService.createHtmlOutputFromFile('Index')`.
@@ -112,6 +113,9 @@ układ wygląda na zepsuty, choć jest poprawny.
 
 ## Zasady projektowe
 
+**Zanim dodasz cokolwiek widocznego, wczytaj skill `system`.** Trzyma spis
+komponentów i tokenów. Nowa klasa i nowy odcień to ostateczność, nie odruch.
+
 **Bez `RRULE`.** Każde posiedzenie to osobne wydarzenie. Seria dzieliłaby jeden
 link Meet, a przesunięcie terminu wymagałoby wyjątków serii. Wydarzenia
 rozpoznajemy po `extendedProperties.private.zrodlo`.
@@ -136,6 +140,11 @@ druku, goście i przypomnienie o cyklu to **dodatki** z `Dodatki.gs`: osobne
 wywołania z przeglądarki, każde może paść bez szkody dla pozostałych i dla
 samego posiedzenia. Nie wciągaj niczego z powrotem do głównego wywołania,
 bo posiedzenie ma dać się zwołać bez tego wszystkiego.
+
+Dodatki są podzielone na etapy polem `etap`: `przed` (rozesłać i przygotować),
+`wtrakcie` (weź na obrady), `po` (domknięcie). To podział wedle tego, **kiedy
+rzecz się przydaje**, a nie kiedy powstaje; co ma polecieć od razu, mówi
+`domyslnie` i `KONFIG.dodatki`.
 
 Dodatek musi spełniać trzy warunki: nigdy nie rzuca wyjątkiem (błąd wraca jako
 stan `blad`), zostawia znacznik `d.<id>` we właściwościach prywatnych

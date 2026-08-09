@@ -309,6 +309,27 @@ const KONFIG = {
    */
   idArkuszaRejestru: '',
 
+  // ─── Tło kalendarza ───────────────────────────────────────────────────────
+
+  /**
+   * Własne wydarzenia Okręgu, wpisywane w tło kalendarza razem z dniami
+   * wolnymi. Powtarzają się co rok, więc podajesz dzień i miesiąc, nie datę.
+   *
+   * Ferii zimowych narzędzie nie wpisuje: MEN ogłasza je co roku osobno dla
+   * każdego województwa i nie ma reguły, z której dałoby się je wyliczyć.
+   * Jeśli ich potrzebujesz, dopisz je tutaj ręcznie po ogłoszeniu.
+   *
+   *   { nazwa: 'Otwarcie sezonu', miesiac: 5, dzien: 1, ileDni: 1, uwaga: '' }
+   */
+  wlasneWydarzenia: [],
+
+  /**
+   * Ile dni w obie strony pokazywać pod polem daty, przy wybieraniu terminu.
+   * Widać tam dni wolne, dni mostkowe, inne posiedzenia i zapowiedzi z planu,
+   * żeby termin dało się ustawić świadomie, a nie poprawiać po ostrzeżeniu.
+   */
+  oknoOtoczeniaDni: 10,
+
   // ─── Plan roczny ──────────────────────────────────────────────────────────
 
   /** Preferowany dzień tygodnia posiedzeń: 0 = niedziela … 4 = czwartek. */
@@ -410,6 +431,8 @@ const RODZAJE_POSIEDZEN = [
 
   {
     id: 'zarzad-okregu',
+    /* Zwołuje prezes albo osoba przez niego upoważniona (§ 46 ust. 2). */
+    upowaznieniePrezesa: true,
     nazwa: 'Posiedzenie Zarządu Okręgu',
     tytul: 'Posiedzenie Zarządu Okręgu Mazowieckiego PZW',
     zdanieZwolania: 'zwołuję posiedzenie Zarządu {okregu}, które odbędzie się',
@@ -451,6 +474,8 @@ const RODZAJE_POSIEDZEN = [
 
   {
     id: 'prezydium',
+    /* Zwołuje prezes albo osoba przez niego upoważniona (§ 48 ust. 4). */
+    upowaznieniePrezesa: true,
     nazwa: 'Posiedzenie Prezydium Zarządu Okręgu',
     tytul: 'Posiedzenie Prezydium Zarządu Okręgu Mazowieckiego PZW',
     zdanieZwolania: 'zwołuję posiedzenie Prezydium Zarządu {okregu}, które odbędzie się',

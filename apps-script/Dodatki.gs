@@ -24,10 +24,35 @@
 const ZNACZNIK_DODATKU = 'd.';
 
 /**
+ * Etapy, na które dzielą się dodatki. Nie wszystko przydaje się w tej samej
+ * chwili: folder na materiały trzeba mieć **przed** obradami, listę obecności
+ * **na** obradach, a przypomnienie o kolejnym terminie dopiero **po**.
+ * Kolejność w tablicy jest kolejnością na liście w interfejsie.
+ */
+const ETAPY = [
+  {
+    id: 'przed',
+    nazwa: 'Przed posiedzeniem',
+    opis: 'Do rozesłania i przygotowania, zanim ktokolwiek się zbierze',
+  },
+  {
+    id: 'wtrakcie',
+    nazwa: 'Na posiedzenie',
+    opis: 'Weź ze sobą albo miej otwarte podczas obrad',
+  },
+  {
+    id: 'po',
+    nazwa: 'Po posiedzeniu',
+    opis: 'Domknięcie sprawy; nic z tego nie jest pilne dzisiaj',
+  },
+];
+
+/**
  * Katalog dodatków.
  *
  * Pola:
  *   id          klucz techniczny; wchodzi do znacznika na wydarzeniu
+ *   etap        kiedy się przydaje: 'przed', 'wtrakcie', 'po'
  *   nazwa       etykieta na liście w interfejsie
  *   opis        jedno zdanie: co powstanie
  *   domyslnie   czy odpalać od razu po utworzeniu posiedzenia
@@ -38,6 +63,7 @@ const DODATKI = [
 
   {
     id: 'cykl',
+    etap: 'po',
     nazwa: 'Przypomnienie o cyklu',
     opis: 'Całodniowy wpis w dniu, w którym upływa termin ze Statutu',
     domyslnie: true,
@@ -54,6 +80,7 @@ const DODATKI = [
 
   {
     id: 'folder',
+    etap: 'przed',
     nazwa: 'Folder na materiały',
     opis: 'Folder na Dysku Google, do którego wrzucisz dokumenty na obrady',
     domyslnie: false,
@@ -65,7 +92,8 @@ const DODATKI = [
 
   {
     id: 'protokol',
-    nazwa: 'Szkielet protokołu',
+    etap: 'wtrakcie',
+    nazwa: 'Dokument protokołu',
     opis: 'Dokument z porządkiem obrad, tabelą uchwał i miejscem na podpisy',
     domyslnie: false,
     dotyczy: function () { return true; },
@@ -76,6 +104,7 @@ const DODATKI = [
 
   {
     id: 'obecnosc',
+    etap: 'wtrakcie',
     nazwa: 'Lista obecności',
     opis: 'Dokument do druku z rubrykami na podpisy członków',
     domyslnie: true,
@@ -89,6 +118,7 @@ const DODATKI = [
 
   {
     id: 'pismo',
+    etap: 'przed',
     nazwa: 'Zawiadomienie do druku',
     opis: 'Pismo na blankiecie Okręgu – § 41 ust. 2 wymaga formy pisemnej',
     domyslnie: true,
@@ -102,6 +132,7 @@ const DODATKI = [
 
   {
     id: 'goscie',
+    etap: 'przed',
     nazwa: 'Zaproszenia w kalendarzu',
     opis: 'Dopisuje członków jako gości – odpowiedzi wracają do wydarzenia',
     domyslnie: false,
@@ -157,7 +188,7 @@ function dopnijDodatek(dane) {
 
 /**
  * Czego przy tym posiedzeniu brakuje. Stąd bierze się lista pod przyciskiem
- * „Dokończ” – także dla posiedzenia założonego tydzień temu.
+ * „Uzupełnij” – także dla posiedzenia założonego tydzień temu.
  */
 function pobierzStanDodatkow(idWydarzenia) {
   const wydarzenie = wczytajPosiedzenie_(idWydarzenia);
@@ -189,6 +220,7 @@ function opiszDodatki_(rodzaj, wlasciwosci) {
 
       return {
         id: dodatek.id,
+        etap: dodatek.etap,
         nazwa: dodatek.nazwa,
         opis: dodatek.opis,
         domyslnie: czyWlaczony_(dodatek),
@@ -196,6 +228,14 @@ function opiszDodatki_(rodzaj, wlasciwosci) {
         link: znacznik ? czyLink_(znacznik) : '',
       };
     });
+}
+
+
+/** Etapy do zbudowania listy w interfejsie; kolejność ma znaczenie. */
+function pobierzEtapy() {
+  return ETAPY.map(function (etap) {
+    return { id: etap.id, nazwa: etap.nazwa, opis: etap.opis };
+  });
 }
 
 

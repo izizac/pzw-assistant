@@ -77,9 +77,27 @@ function domyslnyZwolujacy_(rodzaj) {
  * @param {string} idOsoby identyfikator z KONFIG.zwolujacy ('' = domyślna)
  * @return {string[]} kolejne wiersze podpisu
  */
-function zlozPodpis_(idOsoby, rodzaj) {
-  const osoba = (idOsoby && znajdzZwolujacego_(idOsoby, rodzaj)) ||
+/**
+ * Czy ta osoba jest prezesem zarządu okręgu.
+ *
+ * Statut daje prawo zwołania prezesowi, a poza nim tylko osobie przez niego
+ * upoważnionej (§ 46 ust. 2 dla Zarządu, § 48 ust. 4 dla Prezydium).
+ * Zawiadomienie podpisane przez kogoś innego musi to ujawniać.
+ */
+function czyPrezes_(osoba) {
+  return Boolean(osoba) && /^Prezes\b/.test(osoba.funkcja || '');
+}
+
+
+/** Osoba wskazana do podpisu albo domyślna; null, gdy lista jest pusta. */
+function zwolujacyLubDomyslny_(idOsoby, rodzaj) {
+  return (idOsoby && znajdzZwolujacego_(idOsoby, rodzaj)) ||
     domyslnyZwolujacy_(rodzaj);
+}
+
+
+function zlozPodpis_(idOsoby, rodzaj) {
+  const osoba = zwolujacyLubDomyslny_(idOsoby, rodzaj);
 
   if (!osoba) {
     return KONFIG.podpis || [];

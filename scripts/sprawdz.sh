@@ -109,6 +109,65 @@ for pole in re.findall(r'<(?:input|select|textarea)[^>]*\bid="([^"]+)"', html):
     if pole not in etykietowane:
         problemy.append(f'pole #{pole} – brak <label for>')
 
+# Reguła CSS bywa zabierana razem z sąsiednim blokiem przy cięciach.
+# Klasa bez reguły renderuje się stylem domyślnym i układ cicho się rozjeżdża.
+css = re.search(r'<style>(.*?)</style>', h, re.S).group(1)
+
+zmienne_zdef = set(re.findall(r'(--[\w-]+)\s*:', css))
+for zmienna in sorted(set(re.findall(r'var\((--[\w-]+)', css)) - zmienne_zdef):
+    problemy.append(f'{zmienna} — użyta w CSS, nigdzie nie zdefiniowana')
+
+klasy_uzyte = set()
+for wartosc in re.findall(r'class="([^"]+)"', html):
+    klasy_uzyte |= set(wartosc.split())
+for wartosc in re.findall(r"className = '([^']+)'", js):
+    klasy_uzyte |= set(wartosc.split())
+for wartosc in re.findall(r"classList\.(?:add|toggle)\('([^']+)'", js):
+    klasy_uzyte.add(wartosc)
+
+# Klasy będące wyłącznie uchwytem dla skryptu nie muszą mieć stylu.
+UCHWYTY = {'tresc', 'znak'}
+klasy_css = set(re.findall(r'\.([a-zA-Z][\w-]*)', css))
+for klasa in sorted(klasy_uzyte - klasy_css - UCHWYTY):
+    problemy.append(f'.{klasa} — klasa bez reguły w CSS')
+
+# Wartości zaszyte wprost zamiast tokenów. To one sprawiają, że każdy nowy
+# element ma własny odstęp i własny odcień, a całość się rozjeżdża.
+korzen_koniec = css.find('* { box-sizing')
+poza_korzeniem = css[korzen_koniec:]
+
+WYJATKI_BARW = {'#fff', '#ffffff'}
+zaszyte = sorted({b for b in re.findall(r'#[0-9a-fA-F]{3,6}\b', poza_korzeniem)
+                  if b.lower() not in WYJATKI_BARW})
+if zaszyte:
+    problemy.append('barwy zaszyte poza :root (użyj zmiennej): ' + ', '.join(zaszyte))
+
+# Odstępy mają iść ze skali. Szerokości, wysokości, punkty łamania
+# i przesunięcia optyczne to osobna sprawa i ich nie ruszamy.
+DOZWOLONE_PX = {'0', '1px', '2px', '-1px'}
+zle_px = set()
+for wlasciwosc, wartosc in re.findall(
+        r'\b(padding|margin|gap|row-gap|column-gap)(?:-(?:top|right|bottom|left|inline|block))?'
+        r'\s*:\s*([^;]+);', poza_korzeniem):
+    for piksele in re.findall(r'(-?\d+px)', wartosc):
+        if piksele not in DOZWOLONE_PX:
+            zle_px.add(piksele)
+if zle_px:
+    problemy.append('odstępy w pikselach zamiast --p1…--p7: ' + ', '.join(sorted(zle_px)))
+
+# Skala typograficzna: rozmiar spoza niej rozjeżdża hierarchię i jest jednym
+# z sygnałów, po których poznaje się układ złożony automatem.
+poza_skala = sorted(set(re.findall(r'font-size:\s*([\d.]+rem)', css)))
+if poza_skala:
+    problemy.append('rozmiary pisma poza skalą --t1…--t6: ' + ', '.join(poza_skala))
+
+grubosci = sorted(set(re.findall(r'font-weight:\s*(\d+)', css)))
+if grubosci:
+    problemy.append('grubości poza zmiennymi --g-*: ' + ', '.join(grubosci))
+
+if css.count('{') != css.count('}'):
+    problemy.append(f'nawiasy CSS: {css.count("{")} otwierających, {css.count("}")} zamykających')
+
 # Kierunek odwrotny: miejsce na dane, którego żaden skrypt nie wypełnia,
 # zostaje na stronie jako wieczny szkielet ładowania.
 # Identyfikator bywa przekazywany do funkcji pomocniczej, nie tylko
@@ -124,6 +183,49 @@ if problemy:
 
 print('  ✓ id, ARIA i etykiety pól spójne')
 PY
+
+echo
+echo "── Skille kontra kod ─────────────────────────────────────────────────"
+
+python3 - <<'PYEOF' || bledy=$((bledy + 1))
+import re, sys, pathlib
+
+# Skill, który opisuje nieistniejącą klasę albo funkcję, myli bardziej,
+# niż pomaga. Ta kontrola pilnuje, żeby dokumentacja nadążała za kodem.
+index = pathlib.Path('apps-script/Index.html').read_text(encoding='utf-8')
+css = re.search(r'<style>(.*?)</style>', index, re.S).group(1)
+gs = [p.read_text(encoding='utf-8') for p in pathlib.Path('apps-script').glob('*.gs')]
+
+# Rozszerzenia plików wyglądają jak klasy CSS, więc je pomijamy.
+ROZSZERZENIA = {'doc', 'docx', 'pdf', 'html', 'md', 'gs', 'json', 'py', 'sh', 'js', 'css', 'png', 'svg'}
+problemy = []
+
+for skill in sorted(pathlib.Path('.claude/skills').glob('*/SKILL.md')):
+    tresc = skill.read_text(encoding='utf-8')
+    nazwa = skill.parent.name
+
+    for klasa in sorted(set(re.findall(r'`\.([a-z][\w-]*)`', tresc))):
+        if klasa not in ROZSZERZENIA and f'.{klasa}' not in css:
+            problemy.append(f'{nazwa}: opisuje klasę .{klasa}, której nie ma w CSS')
+
+    for zmienna in sorted(set(re.findall(r'`(--[\w-]+)`', tresc))):
+        if f'{zmienna}:' not in css:
+            problemy.append(f'{nazwa}: opisuje zmienną {zmienna}, której nie ma')
+
+    for fn in sorted(set(re.findall(r'`(pobierz\w+|utworz\w+|zloz\w+)`', tresc))):
+        if not any(f'function {fn}(' in t for t in gs):
+            problemy.append(f'{nazwa}: wskazuje funkcję {fn}(), której nie ma')
+
+    for skrypt in sorted(set(re.findall(r'`?scripts/([\w.]+)', tresc))):
+        if not pathlib.Path('scripts', skrypt).exists():
+            problemy.append(f'{nazwa}: odsyła do scripts/{skrypt}, którego nie ma')
+
+if problemy:
+    print('  ✗ ' + '\n  ✗ '.join(problemy))
+    sys.exit(1)
+
+print('  ✓ skille zgodne z kodem')
+PYEOF
 
 echo
 echo "── Kontrast ──────────────────────────────────────────────────────────"

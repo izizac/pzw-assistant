@@ -30,13 +30,13 @@ ATRAPA = """
   window.google = { script: { run: (function () {
     // Dodatki wracają w kilku miejscach naraz, więc stoją w jednym miejscu.
     const DODATKI_PRZYKLAD = [
-      { id: 'cykl', nazwa: 'Przypomnienie o cyklu', domyslnie: true, stan: 'gotowe',
+      { id: 'cykl', etap: 'po', nazwa: 'Przypomnienie o cyklu', domyslnie: true, stan: 'gotowe',
         link: '', opis: 'Całodniowy wpis w dniu, w którym upływa termin ze Statutu' },
-      { id: 'obecnosc', nazwa: 'Lista obecności', domyslnie: true, stan: 'gotowe',
+      { id: 'obecnosc', etap: 'wtrakcie', nazwa: 'Lista obecności', domyslnie: true, stan: 'gotowe',
         link: '#', opis: 'Dokument do druku z rubrykami na podpisy członków' },
-      { id: 'folder', nazwa: 'Folder na materiały', domyslnie: false, stan: 'oczekuje',
+      { id: 'folder', etap: 'przed', nazwa: 'Folder na materiały', domyslnie: false, stan: 'oczekuje',
         link: '', opis: 'Folder na Dysku Google, do którego wrzucisz dokumenty na obrady' },
-      { id: 'protokol', nazwa: 'Szkielet protokołu', domyslnie: false, stan: 'oczekuje',
+      { id: 'protokol', etap: 'wtrakcie', nazwa: 'Szkielet protokołu', domyslnie: false, stan: 'oczekuje',
         link: '', opis: 'Dokument z porządkiem obrad, tabelą uchwał i miejscem na podpisy' },
     ];
 
@@ -54,6 +54,11 @@ ATRAPA = """
         mailWlaczony: true,
         liczbaAdresatow: 13,
         rejestrUchwal: true,
+        etapy: [
+          { id: 'przed', nazwa: 'Przed posiedzeniem', opis: 'Do rozesłania i przygotowania' },
+          { id: 'wtrakcie', nazwa: 'Na posiedzenie', opis: 'Weź ze sobą albo miej otwarte' },
+          { id: 'po', nazwa: 'Po posiedzeniu', opis: 'Domknięcie sprawy' },
+        ],
         preferowanyDzienTygodnia: 4,
         ktoryTydzienMiesiaca: 2,
         przypomnienia: { dostepne: true, zainstalowany: false, godzina: 7 },
@@ -131,6 +136,82 @@ ATRAPA = """
         { tytul: 'Upływa termin: Posiedzenie Zarządu Okręgu', kiedy: '9 września 2026 r.', termin: true, linkWydarzenia: '#' },
         { tytul: 'Posiedzenie Zarządu Okręgu Mazowieckiego PZW', kiedy: '6 października 2026 r., godz. 11:00', termin: false, linkWydarzenia: '#' },
       ],
+      pobierzOtoczenieTerminu: function (data) {
+        const MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca',
+          'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+        const MIESM = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
+          'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'];
+        const DNI = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek',
+          'piątek', 'sobota'];
+        // Skrót atrapy: kilka świąt i jedna przerwa. Prawdziwe reguły siedzą
+        // w KalendarzPolski.gs.
+        const SWIETA = { '01-01': 'Nowy Rok', '05-01': 'Święto Państwowe',
+          '05-03': 'Święto Narodowe Trzeciego Maja', '11-01': 'Wszystkich Świętych',
+          '11-11': 'Narodowe Święto Niepodległości',
+          '12-24': 'Wigilia Bożego Narodzenia', '12-25': 'Boże Narodzenie',
+          '12-26': 'Boże Narodzenie, drugi dzień' };
+
+        const dwa = (n) => (n < 10 ? '0' : '') + n;
+        const iso = (d) => d.getFullYear() + '-' + dwa(d.getMonth() + 1) + '-' + dwa(d.getDate());
+        const md = (d) => dwa(d.getMonth() + 1) + '-' + dwa(d.getDate());
+        const dat = (d) => d.getDate() + ' ' + MIES[d.getMonth()] + ' ' + d.getFullYear() + ' r.';
+        const przesun = (d, ile) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + ile);
+        const przerwa = (d) => md(d) >= '12-23' && md(d) <= '12-31';
+
+        const czesci = String(data).split('-').map(Number);
+        const srodek = new Date(czesci[0], czesci[1] - 1, czesci[2]);
+
+        const pozycje = [];
+        for (let i = -10; i <= 10; i++) {
+          const d = przesun(srodek, i);
+          const swieto = SWIETA[md(d)];
+          if (!swieto) { continue; }
+          pozycje.push({ data: iso(d), nazwa: swieto, rodzaj: 'wolne', godzina: '',
+            odleglosc: i, opis: DNI[d.getDay()] + ', ' + dat(d),
+            kiedy: i === 0 ? 'tego samego dnia' : i === -1 ? 'dzień wcześniej'
+              : i === 1 ? 'nazajutrz'
+              : Math.abs(i) + ' dni ' + (i < 0 ? 'wcześniej' : 'później') });
+        }
+        if (przerwa(srodek)) {
+          pozycje.unshift({ data: iso(srodek), nazwa: 'Zimowa przerwa świąteczna',
+            rodzaj: 'szkolne', godzina: '', odleglosc: 0, kiedy: 'tego samego dnia',
+            opis: '23 grudnia ' + srodek.getFullYear() + ' r. – 31 grudnia ' +
+              srodek.getFullYear() + ' r.' });
+        }
+
+        const pierwszy = new Date(srodek.getFullYear(), srodek.getMonth(), 1);
+        const ostatni = new Date(srodek.getFullYear(), srodek.getMonth() + 1, 0);
+        const od = przesun(pierwszy, -((pierwszy.getDay() + 6) % 7));
+        const doDnia = przesun(ostatni, 6 - ((ostatni.getDay() + 6) % 7));
+
+        const tygodnie = [];
+        let tydzien = [];
+        for (let d = new Date(od); d <= doDnia; d = przesun(d, 1)) {
+          const swieto = SWIETA[md(d)] || '';
+          tydzien.push({
+            dzien: d.getDate(), data: iso(d),
+            poza: d.getMonth() !== srodek.getMonth(),
+            wybrany: iso(d) === iso(srodek),
+            wolne: Boolean(swieto) || d.getDay() === 0,
+            swieto: swieto,
+            szkolne: !swieto && przerwa(d),
+            mostek: false,
+            wydarzen: iso(d) === iso(przesun(srodek, 5)) ? 1 : 0,
+            opis: DNI[d.getDay()] + ', ' + dat(d) + (swieto ? '. ' + swieto : ''),
+          });
+          if (tydzien.length === 7) { tygodnie.push(tydzien); tydzien = []; }
+        }
+
+        return {
+          promien: 10,
+          siatka: {
+            naglowek: MIESM[srodek.getMonth()] + ' ' + srodek.getFullYear(),
+            dni: ['pon', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'],
+            tygodnie: tygodnie,
+          },
+          pozycje: pozycje,
+        };
+      },
       pobierzMinione: {
         ostatnie: {
           'zarzad-okregu': { godzina: '10:30', czasTrwania: 210, miejsce: 'Biuro Okręgu, Serock', data: '9 czerwca 2026 r.' },
@@ -204,6 +285,25 @@ ATRAPA = """
             data: '2026-08-13', przedmiot: 'Składki na ochronę i zagospodarowanie wód', czeka: true },
         ],
       },
+      zaproponujKalendarzRoku: {
+        rok: 2027,
+        grupy: [
+          { id: 'swieta', nazwa: 'Dni ustawowo wolne od pracy', opis: 'Święta stałe i ruchome',
+            wpisy: [
+              { grupa: 'swieta', nazwa: 'Boże Ciało', od: '2027-05-27', doDnia: '2027-05-27',
+                opis: 'czwartek, 27 maja 2027 r.', uwaga: 'Dzień ustawowo wolny od pracy.', wybrany: true },
+              { grupa: 'swieta', nazwa: 'Wszystkich Świętych', od: '2027-11-01', doDnia: '2027-11-01',
+                opis: 'poniedziałek, 1 listopada 2027 r.', uwaga: 'Dzień ustawowo wolny od pracy.', wybrany: true },
+            ] },
+          { id: 'szkolne', nazwa: 'Kalendarz szkolny', opis: 'Przerwy świąteczne i wakacje',
+            wpisy: [
+              { grupa: 'szkolne', nazwa: 'Wakacje letnie', od: '2027-06-26', doDnia: '2027-08-31',
+                opis: '26 czerwca 2027 r. – 31 sierpnia 2027 r.', uwaga: '', wybrany: true },
+            ] },
+        ],
+      },
+      utworzKalendarzRoku: { zalozonych: 18, komunikat: 'Wpisano 18 pozycji do kalendarza.' },
+      usunKalendarzRoku: { usunietych: 18, komunikat: 'Usunięto 18 pozycji.' },
       zarejestrujUchwale: { numer: 'Uchwała nr 13/2026 Prezydium ZO', link: '#' },
       pobierzFrekwencje: {
         tytul: 'Posiedzenie Zarządu Okręgu Mazowieckiego PZW',
@@ -226,7 +326,13 @@ ATRAPA = """
     Object.keys(DANE).forEach(function (nazwa) {
       uchwyt[nazwa] = function () {
         const f = sukces;
-        setTimeout(function () { f(DANE[nazwa]); }, 120);
+        // Argumenty muszą dojść do atrapy, inaczej podgląd pokazuje te same
+        // dane niezależnie od wybranej daty i kłamie o działaniu narzędzia.
+        const argumenty = Array.prototype.slice.call(arguments);
+        setTimeout(function () {
+          const dane = DANE[nazwa];
+          f(typeof dane === 'function' ? dane.apply(null, argumenty) : dane);
+        }, 120);
         return uchwyt;
       };
     });
@@ -285,6 +391,22 @@ def wersja_ciemna(plik: Path) -> Path:
     return cel
 
 
+def wersja_duzy_tekst(plik: Path) -> Path:
+    """Podnosi bazowy stopień pisma do 125%, jak przy powiększeniu w systemie.
+
+    Apple nazywa to Dynamic Type i wymaga, żeby układ to zniósł. Tutaj sprawdza
+    to samo: czy odstępy i cele dotykowe rosną razem z tekstem, czy zostają
+    w miejscu i rozjeżdżają układ.
+    """
+    cel = Path('/tmp/pzw-podglad-duzy.html')
+    cel.write_text(
+        plik.read_text(encoding='utf-8').replace(
+            '<style>', '<style>\n  html { font-size: 125%; }\n', 1),
+        encoding='utf-8',
+    )
+    return cel
+
+
 def w_ramce(plik: Path, szerokosc: int, wysokosc: int) -> Path:
     """Opakowuje podgląd w <iframe> zadanej szerokości.
 
@@ -327,12 +449,14 @@ def zrzuty(plik: Path) -> None:
 
     # Biurko i tablet mieszczą się w oknie; telefon idzie przez ramkę.
     zrzut(plik, 'biurko', 1200, 1000)
+    zrzut(plik, 'caly', 1200, 2300)
     zrzut(plik, 'tablet', 820, 1100)
     zrzut(w_ramce(plik, 390, 1400), 'telefon', 520, 1400)
 
     zrzut(Path(str(plik) + '#podglad'), 'podglad', 1200, 1100)
     zrzut(Path(str(plik) + '#wynik'), 'wynik', 1200, 1100)
     zrzut(wersja_ciemna(plik), 'ciemny', 1200, 1000)
+    zrzut(wersja_duzy_tekst(plik), 'duzy-tekst', 1200, 1300)
 
 
 def main() -> int:

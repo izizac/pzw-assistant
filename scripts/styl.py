@@ -172,7 +172,16 @@ def zbadaj(sciezka: Path, szczegoly: bool):
 
 def pliki(argumenty):
     if argumenty:
-        return [Path(a) for a in argumenty]
+        # Katalog w argumencie rozwijamy; wcześniej skrypt się na tym wywracał.
+        wskazane = []
+        for arg in argumenty:
+            sciezka = Path(arg)
+            if sciezka.is_dir():
+                wskazane += sorted(x for x in sciezka.rglob('*')
+                                   if x.is_file() and x.suffix in ROZSZERZENIA)
+            else:
+                wskazane.append(sciezka)
+        return wskazane
 
     znalezione = []
     for sciezka in KORZEN.rglob('*'):

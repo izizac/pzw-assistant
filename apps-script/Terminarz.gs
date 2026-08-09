@@ -20,7 +20,7 @@ const FUNKCJA_PRZYPOMNIENIA = 'przypomnijOJutrzejszychPosiedzeniach';
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Dla każdego gremium, które Statut każe zwoływać cyklicznie: kiedy było
+ * Dla każdego organu, który Statut każe zwoływać cyklicznie: kiedy było
  * ostatnio, do kiedy musi się zebrać i czy termin już minął.
  *
  * @return {{rodzaj: string, nazwa: string, cykl: string, stan: string,
@@ -159,6 +159,13 @@ const SWIETA_STALE = {
   '08-15': 'Wniebowzięcie Najświętszej Maryi Panny',
   '11-01': 'Wszystkich Świętych',
   '11-11': 'Narodowe Święto Niepodległości',
+  /**
+   * Wigilia jest dniem ustawowo wolnym od pracy od 2025 r., na mocy ustawy
+   * z 6 grudnia 2024 r. o zmianie ustawy o dniach wolnych od pracy.
+   * Wcześniej była zwykłym dniem roboczym, więc starsze kalendarze jej tu
+   * nie mają.
+   */
+  '12-24': 'Wigilia Bożego Narodzenia',
   '12-25': 'Boże Narodzenie',
   '12-26': 'Boże Narodzenie, drugi dzień',
 };
@@ -191,7 +198,13 @@ function opiszDzienWolny_(data) {
 
   const mostek = opiszMostek_(data, swieta);
 
-  return mostek || '';
+  if (mostek) {
+    return mostek;
+  }
+
+  // Przerwy i wakacje nie są dniami wolnymi od pracy, ale wtedy wyjeżdża się
+  // z rodziną i frekwencja siada. To informacja, nie zarzut.
+  return opiszOkresSzkolny_(data);
 }
 
 

@@ -72,7 +72,7 @@ w przeglądarce z dat `ostatnie` i `termin` (parser polskich dat w
 `zeSformatowanej`). **Bez kompletu dat wskaźnik się nie pojawia** — zmyślony
 pasek byłby gorszy niż jego brak.
 
-Barwy wypełnień przeszły `scripts/validate_palette.js` ze skilla `dataviz`:
+Barwy wypełnień przeszły walidator palety ze skilla `dataviz` (uruchamiasz go z katalogu tego skilla):
 `#1f5aa8` w terminie, `#94700a` blisko, `#9c1330` po terminie. ΔE 20,2 przy
 zwykłym widzeniu, 12,3 przy deuteranopii, każda powyżej 3:1 wobec toru.
 Pierwsze dwa podejścia odpadły, bo bursztyn i czerwień siadały na ΔE 12.
@@ -124,9 +124,8 @@ dla ciemnego motywu.
 
 | Zmienna | Do czego | Skąd |
 | --- | --- | --- |
-| `--granat`, `--granat-2` | belka blankietu | `#020c3a` — belka nagłówka om.pzw.pl |
+| `--granat` | belka blankietu | rola `--m3-on-primary-container` |
 | `--akcent`, `--akcent-ciemny`, `--akcent-tlo` | przyciski, odnośniki | `#012880` — przycisk główny om.pzw.pl |
-| `--blekit` | krechy i znaki graficzne | `#084685` — akcent pomocniczy portalu |
 | `--tlo`, `--karta`, `--karta-2` | tła: strona, karta, sekcja zwijana | |
 | `--tekst`, `--tekst-2` | tekst podstawowy i drugorzędny | |
 | `--ramka`, `--ramka-mocna` | linie rozdzielające, ramki pól | |

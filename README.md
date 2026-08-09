@@ -209,6 +209,15 @@ jest osobnym wywołaniem, lecą równolegle i każdy może się nie udać bez sz
 dla pozostałych ani dla samego posiedzenia. Nieudany folder na Dysku nie
 odwołuje obrad.
 
+Lista dodatków jest podzielona na trzy etapy, bo nie wszystko przydaje się
+w tej samej chwili:
+
+| Etap | Co tam trafia |
+| --- | --- |
+| **Przed posiedzeniem** | folder na materiały, zawiadomienie do druku, zaproszenia w kalendarzu |
+| **Na posiedzenie** | lista obecności, szkielet protokołu |
+| **Po posiedzeniu** | przypomnienie o kolejnym terminie w cyklu |
+
 Stan dodatku siedzi na wydarzeniu, nie w przeglądarce. Zamknięcie karty
 w połowie niczego nie psuje: przy każdym posiedzeniu na liście najbliższych
 jest przycisk **Dokończ**, który pokazuje, czego brakuje, i pozwala dopiąć to
@@ -222,6 +231,22 @@ wzięte z **rozesłanego** zawiadomienia, tabelę uchwał i podpisy. Odnośnik
 trafia do opisu wydarzenia. Punkt „przyjęcie protokołu z poprzedniego
 posiedzenia" stoi w porządku obrad każdego organu, więc protokół i tak musi
 powstać.
+
+### Tło kalendarza
+
+Terminy posiedzeń układa się wokół tego, kiedy ludzie są dostępni. Narzędzie
+wpisuje więc do kalendarza **dni ustawowo wolne od pracy** (święta stałe
+i ruchome, te drugie liczone z daty Wielkanocy algorytmem Meeusa), **dni
+mostkowe** oraz **kalendarz szkolny**: obie przerwy świąteczne, wakacje,
+rozpoczęcie i zakończenie zajęć. Wpisy są przezroczyste, więc niczego nie
+blokują. Własne wydarzenia Okręgu dopisujesz w `KONFIG.wlasneWydarzenia`.
+
+**Ferii zimowych narzędzie nie wpisuje.** MEN ogłasza je co roku osobno dla
+każdego województwa i nie ma reguły, z której dałoby się je wyliczyć; wpisanie
+zmyślonych dat do kalendarza władz Okręgu byłoby gorsze niż ich brak. Daty
+z kalendarza szkolnego wynikają z reguł rozporządzenia o organizacji roku
+szkolnego, a wiążący kalendarz publikuje
+[MEN](https://www.gov.pl/web/edukacja/kalendarz-roku-szkolnego).
 
 ### Przypomnienie dzień wcześniej
 
@@ -246,6 +271,40 @@ Ikona koła zębatego (**Ustawienia projektu**) → zaznacz
 **Pokaż plik manifestu „appsscript.json" w edytorze**.
 
 ### 3. Wgraj pliki
+
+Masz dwie drogi. **Z komputera** jest szybsza i nie gubi plików przy
+kopiowaniu; **ręcznie** działa bez instalowania czegokolwiek.
+
+#### Z komputera (zalecane)
+
+Jednorazowo:
+
+```bash
+npx --yes @google/clasp@3.3.0 login
+npx --yes @google/clasp@3.3.0 clone <IDENTYFIKATOR_SKRYPTU> --rootDir apps-script
+```
+
+Identyfikator: w edytorze Apps Script **Ustawienia projektu → Identyfikatory →
+Identyfikator skryptu**. Trzeba też raz włączyć Apps Script API pod adresem
+<https://script.google.com/home/usersettings>.
+
+Potem każda wysyłka to jedna komenda:
+
+```bash
+./scripts/wgraj.sh            # wgraj pliki
+./scripts/wgraj.sh --wersja   # wgraj i odśwież adres /exec
+```
+
+Skrypt **najpierw uruchamia `sprawdz.sh`** i wysyła tylko wtedy, gdy wszystko
+przechodzi. Dwie rzeczy warto wiedzieć: `push` **nadpisuje projekt online**,
+więc zmiany zrobione w edytorze przeglądarkowym i niepobrane wcześniej
+przepadną; a sam `push` nie zmienia tego, co widzą użytkownicy pod adresem
+`/exec` — do tego służy `--wersja`.
+
+`.clasp.json` powstaje lokalnie i nie trafia do repozytorium, bo wskazuje
+na konkretny projekt.
+
+#### Ręcznie
 
 W edytorze utwórz pliki o nazwach dokładnie takich jak poniżej i wklej
 zawartość z tego repozytorium:
@@ -363,12 +422,15 @@ docs/
   apps-script.md           notatki techniczne i pułapki środowiska
   linki.md                 sprawdzone adresy — Okręg, akty prawne, Apps Script
 scripts/
+  wgraj.sh                 sprawdzenie i wysyłka do Apps Script przez clasp
   sprawdz.sh               składnia + powiązania ARIA + kontrast, jedną komendą
+  tony.py                  paleta tonalna Material 3 z ziarna #012880
   kontrast.py              kontrast palety względem WCAG 2.2
   podglad.py               render interfejsu z atrapą serwera + zrzuty ekranu
   styl.py                  ślady pisania maszynowego w tekstach projektu
 CLAUDE.md            instrukcje dla agenta AI
 .claude/skills/
+  system/                  spis komponentów i tokenów; czytany przed każdą zmianą wyglądu
   rodzaj-posiedzenia/      dodanie nowego rodzaju posiedzenia
   interfejs/               kierunek wizualny, układ, dostępność
   przeglad-ui/             audyt gotowego interfejsu na zrzutach, WCAG 2.2

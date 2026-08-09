@@ -114,7 +114,7 @@ function pobierzFrekwencje(idWydarzenia) {
 function ocenKworum_(rodzaj, potwierdzilo) {
   if (!rodzaj || !rodzaj.sklad) {
     return 'Potwierdziło ' + odmienOsoby_(potwierdzilo) +
-      '. Skład tego gremium nie jest wpisany w konfiguracji, więc kworum ' +
+      '. Skład tego organu nie jest wpisany w konfiguracji, więc kworum ' +
       'trzeba ocenić samodzielnie.';
   }
 
