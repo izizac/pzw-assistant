@@ -1,0 +1,178 @@
+# Statut PZW — władze okręgu (wyciąg)
+
+Źródło: **Statut Polskiego Związku Wędkarskiego**, tekst jednolity z 15 marca
+2017 r., rozdział V „Okręgi Związku” (§§ 37–52).
+PDF: <https://pzw.org.pl/brepo/panel_repo/2023/03/03/dttmhj/statut-pzw.pdf>
+
+To jest źródło prawdy dla `RODZAJE_POSIEDZEN` w `apps-script/Konfiguracja.gs`.
+Cytaty są parafrazami przyciętymi do tego, co narzędzie musi wiedzieć —
+przy sporze sięgaj do PDF-a.
+
+## Ustrój okręgu
+
+**§ 37 ust. 1–2** — okręg jest terenową jednostką organizacyjną Związku;
+teren działania określa uchwała Zarządu Głównego o powołaniu okręgu.
+Okręg ma **odrębną osobowość prawną** (§ 63 ust. 3).
+
+**§ 37 ust. 9** — okręgi mogą organizować współpracę kół w ustalonych przez
+siebie **rejonach**.
+
+**§ 39** — władze i organy okręgu:
+
+| Ciało                        | Rola                                            |
+| ---------------------------- | ----------------------------------------------- |
+| Okręgowy zjazd delegatów     | najwyższa władza okręgu                          |
+| Zarząd okręgu                | władza w okresie między zjazdami                 |
+| Okręgowa komisja rewizyjna   | organ kontroli wewnętrznej                       |
+| Okręgowy sąd koleżeński      | organ orzekający w sprawach przewinień członków  |
+
+## Okręgowy zjazd delegatów
+
+**§ 40** — zjazd może być zwyczajny albo nadzwyczajny.
+
+**§ 41 ust. 1** — zwyczajny zjazd zwołuje zarząd okręgu **co 4 lata**,
+w terminie uzgodnionym z Zarządem Głównym.
+
+**§ 41 ust. 2** — o terminie, miejscu i porządku dziennym zarząd okręgu
+zawiadamia delegatów **i zarządy kół**, **na piśmie**, **co najmniej na 21 dni**
+przed zjazdem, załączając sprawozdanie z działalności oraz inne dokumenty
+i wnioski będące tematem obrad.
+
+> To najostrzejszy wymóg formalny na tym szczeblu. Mail nie wyczerpuje formy
+> pisemnej — narzędzie ostrzega o tym przy każdym zjeździe.
+
+**§ 42** — w zjeździe uczestniczą delegaci wybrani na walnych zgromadzeniach
+członków kół (wg ordynacji uchwalonej przez zarząd okręgu), a z głosem
+doradczym członkowie ustępujących władz i organów oraz osoby zaproszone.
+
+**§ 43** — kompetencje zjazdu:
+
+1. uchwalanie porządku i zatwierdzanie regulaminu obrad,
+2. rozpatrywanie i zatwierdzanie sprawozdań oraz programów działania,
+3. rozpatrywanie wniosków zarządu okręgu, OKR, OSK i zgłoszonych na zjeździe,
+4. uchwała w przedmiocie **absolutorium** dla ustępującego zarządu — na wniosek OKR,
+5. ustalanie składu liczbowego zarządu oraz organów okręgu,
+6. wybór prezesa zarządu okręgu, członków zarządu, OKR i OSK,
+7. wybór delegatów i zastępców na Krajowy Zjazd Delegatów.
+
+**Kworum zjazdu** — Statut go **nie określa**. Reguluje je regulamin obrad
+zatwierdzany przez sam Zjazd (§ 43 pkt 1). Nie wpisuj do zawiadomienia reguły
+„połowa w pierwszym terminie” — to przepis dla **koła** (§ 54 ust. 8), nie dla
+zjazdu okręgowego.
+
+**§ 44** — nadzwyczajny zjazd zwołuje zarząd okręgu z własnej inicjatywy albo
+w terminie **3 miesięcy** od wniosku: Zarządu Głównego, okręgowej komisji
+rewizyjnej, co najmniej 1/3 zarządów kół, 1/3 delegatów na ostatni zjazd.
+Przy niedotrzymaniu terminu zjazd zwołuje **niezwłocznie OKR** (ust. 2).
+Uchwały **tylko w sprawach, dla rozpatrzenia których zjazd zwołano** (ust. 3).
+
+## Zarząd okręgu
+
+**§ 45 ust. 1** — zarząd liczy **od 11 do 31 członków** wraz z prezesem,
+wybranych przez zjazd.
+
+**§ 45 ust. 2** — pierwsze posiedzenie **nie później niż 10 dni** od wyborów;
+na wniosek prezesa **dopuszcza się** wybór prezydium: prezes (wybrany przez
+Zjazd), wiceprezesi, sekretarz, skarbnik, członkowie prezydium.
+
+**§ 45 ust. 3** — liczba członków prezydium **nie może przekraczać 1/2** stanu
+liczbowego zarządu okręgu.
+
+> Prezydium jest fakultatywne. Jeśli zarząd go nie powołał, rodzaj posiedzenia
+> `prezydium` po prostu nie ma zastosowania.
+
+**§ 46 ust. 1** — zarząd okręgu obraduje w miarę potrzeb, jednak **nie rzadziej
+niż raz na kwartał**.
+
+**§ 46 ust. 2** — posiedzenia zwołuje **prezes lub upoważniony przez niego
+członek zarządu**.
+
+**§ 46 ust. 3** — między posiedzeniami prezydium i zarządu działalnością
+kieruje prezes lub wyznaczony przez niego wiceprezes.
+
+**§ 47** — zakres działania zarządu okręgu, 30 punktów. Te, które trafiły do
+szkicu porządku obrad:
+
+| Pkt | Sprawa                                                              |
+| --- | ------------------------------------------------------------------- |
+| 2   | realizowanie uchwał KZD, okręgowego zjazdu i Zarządu Głównego        |
+| 3   | zwoływanie okręgowego zjazdu delegatów                               |
+| 4   | uchwalanie ordynacji wyborczej dla kół                               |
+| 5   | wnioski pokontrolne OKR i zalecenia Głównej Komisji Rewizyjnej       |
+| 6   | rozpatrywanie i zatwierdzanie rocznych sprawozdań finansowych        |
+| 7   | zatwierdzanie rocznych budżetów okręgu                               |
+| 8   | wysokość składek na ochronę i zagospodarowanie wód                   |
+| 9   | powoływanie kół, teren działania, minimalna liczba członków          |
+| 11  | odznaki związkowe, odznaki okręgowe i wyróżnienia                    |
+| 12  | **powoływanie komisji** niezbędnych do zadań okręgu i ich regulaminów |
+| 13  | umowy, nieruchomości, działalność gospodarcza                        |
+| 14  | jednostki gospodarcze i spółki prawa handlowego — **kworum kwalifikowane** |
+| 15  | ochrona i zagospodarowanie wód                                       |
+| 16  | działalność sportowa i rekreacyjna, kadry okręgowe                   |
+| 17  | praca z młodzieżą wędkarską                                          |
+| 18  | działalność szkoleniowa                                              |
+| 20  | nadzór nad obsługą finansowo-księgową kół                            |
+| 29  | **organizowanie współpracy kół**                                     |
+| 30  | powoływanie komisji egzaminacyjnych na kartę wędkarską               |
+
+**§ 47 pkt 14 — jedyne kworum kwalifikowane na szczeblu okręgu.** Uchwały
+o powoływaniu i likwidacji jednostek gospodarczych oraz o tworzeniu
+i przystępowaniu do spółek prawa handlowego zapadają **większością 2/3 głosów
+przy obecności co najmniej 2/3 członków** zarządu okręgu. Przy 13-osobowym
+zarządzie: 9 obecnych, 6 głosów za.
+
+## Prezydium zarządu okręgu
+
+**§ 48 ust. 1** — prezydium obraduje w miarę potrzeb, jednak **nie rzadziej niż
+raz w miesiącu**.
+
+**§ 48 ust. 2** — prezydium kieruje na bieżąco całokształtem spraw
+podlegających kompetencji zarządu okręgu. Uchwały podjęte w sprawach
+z **§ 47 pkt 3–14, 23–25 i 27** podlegają **przedłożeniu na najbliższym
+posiedzeniu zarządu okręgu**, który może je **uchylić bądź zmienić**.
+
+**§ 48 ust. 3** — roczne sprawozdanie finansowe przedstawia prezydium albo
+skarbnik, celem zatwierdzenia przez zarząd okręgu.
+
+**§ 48 ust. 4** — posiedzenia prezydium i zarządu zwołuje **prezes lub
+upoważniony przez niego wiceprezes**.
+
+## Okręgowa komisja rewizyjna
+
+**§ 49** — **od 5 do 9 członków** wybranych przez zjazd; ukonstytuowanie
+w terminie **10 dni** od wyborów (przewodniczący, zastępca, sekretarz).
+
+**§ 50 ust. 1** — działa na podstawie Regulaminu komisji rewizyjnych PZW.
+
+**§ 50 ust. 2** — zakres działania:
+
+1. kontrolowanie działalności okręgu,
+2. wnioski pokontrolne do zarządu okręgu,
+3. **kontrolowanie działalności zarządu okręgu nie rzadziej niż raz w roku**,
+4. współpraca z komisjami rewizyjnymi kół,
+5. sprawozdanie na zjeździe oraz **informacja raz w roku na posiedzeniu zarządu okręgu**,
+6. wniosek w przedmiocie absolutorium dla ustępującego zarządu.
+
+## Okręgowy sąd koleżeński
+
+**§ 51** — **od 7 do 9 członków**; przewodniczący, zastępca i sekretarz
+w terminie **10 dni** od wyborów.
+
+**§ 52** — działa na podstawie regulaminu uchwalonego przez Zarząd Główny;
+sprawozdanie na zjeździe oraz **informacja raz w roku na posiedzeniu zarządu
+okręgu**.
+
+## Czego tu NIE ma — pułapka
+
+Przepisy o **kole** leżą w rozdziale VI (§§ 53–62) i **nie stosują się** do
+okręgu. Najczęstsze pomyłki:
+
+| Przepis koła              | Czego dotyczy                                    |
+| ------------------------- | ------------------------------------------------ |
+| § 54 ust. 5               | 21 dni na powiadomienie o walnym zgromadzeniu koła |
+| § 54 ust. 8               | kworum: 1/2 w I terminie, dowolne w II            |
+| § 56 ust. 4               | zarząd koła — nie rzadziej niż raz w miesiącu     |
+| Regulamin Organizacyjny Koła PZW | uchwała 205/XII/2019 ZG PZW — cały dokument dotyczy wyłącznie kół |
+
+Reguła „pierwszy i drugi termin” to konstrukcja **kołowa**. Na szczeblu okręgu
+Statut o niej milczy.

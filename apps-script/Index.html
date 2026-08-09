@@ -1,0 +1,2643 @@
+<!-- Interfejs generatora posiedzeń. Logika po stronie serwera: Kod.gs -->
+<style>
+  /* ── Skala i kolory ──────────────────────────────────────────────────────
+     Odstępy w krokach po 4 px, żeby wszystko układało się na jednej siatce.
+     Kolory przez zmienne, bo motyw ciemny podmienia tylko wartości.          */
+
+  :root {
+    --p1: 4px;  --p2: 8px;  --p3: 12px; --p4: 16px;
+    --p5: 24px; --p6: 32px; --p7: 48px;
+
+    --zaokraglenie: 10px;
+    --zaokraglenie-male: 6px;
+
+    /* Minimalna wysokość celu dotykowego — 44 px wg WCAG 2.5.5. */
+    --cel-dotyku: 44px;
+
+    /* Szerokość prawej kolumny. Próg 840 px dobrany tak, żeby przy dwóch
+       kolumnach na główną zostało ~530 px — poniżej formularz robi się ciasny. */
+    --bok: 280px;
+
+    /* Serwis Okręgu jest w całości bezszeryfowy, więc nagłówki też — różnicę
+       niesie grubość i ciaśniejszy trakt, nie inny krój. Maszynowy zostaje
+       do paragrafów Statutu i treści pisma. */
+    --krój-tekstowy: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    --krój-maszynowy: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    /* Barwy odczytane z pikseli serwisu Okręgu (om.pzw.pl): belka nagłówka
+       #020c3a, przycisk główny #012880, akcent pomocniczy #084685.
+       Godło Okręgu ma własny, jaśniejszy błękit #4e76b4 — używamy go tylko
+       tam, gdzie występuje samo godło (favikona). */
+    --granat: #020c3a;
+    --granat-2: #06154d;
+    --blekit: #084685;
+    --blekit-wash: #e8eefb;
+
+    --tlo: #f2f4f9;
+    --karta: #ffffff;
+    --karta-2: #edf1f9;
+    --tekst: #0f1729;
+    --tekst-2: #4e5c75;
+    --ramka: #d9dfeb;
+    --ramka-mocna: #808ea6;
+
+    --akcent: #012880;
+    --akcent-ciemny: #06154d;
+    --akcent-tlo: #e8eefb;
+
+    /* Stany cyklu statutowego. Zestaw przeszedł walidator palety: ΔE 20,2
+       przy zwykłym widzeniu i 12,3 przy deuteranopii, każdy powyżej 3:1
+       wobec toru #e8eefb. Barwa nigdy nie niesie znaczenia sama — obok
+       stoi etykieta słowna. */
+    --w-terminie: #1f5aa8;
+    --blisko: #94700a;
+    --po-terminie: #9c1330;
+
+    --blad-tlo: #fcece9;
+    --blad-tekst: #952415;
+    --blad-ramka: #eec5bd;
+
+    /* Ostrzeżenia w barwie pieczęci — bliżej urzędowego pisma niż żółty alert. */
+    --uwaga-tlo: #fbf1e8;
+    --uwaga-tekst: #874026;
+    --uwaga-ramka: #e5cbb7;
+
+    --sukces-tlo: #e8eefb;
+    --sukces-tekst: #012880;
+
+    /* Bez cieni. Portal Okręgu ma karty płaskie, a jednakowy cień na każdej
+       powierzchni to jeden z najczęściej wymienianych znaków interfejsu
+       generowanego maszynowo. Głębię niesie tło i hierarchia, nie rozmycie. */
+    --cien: none;
+    --cien-naglowka: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --granat: #020c3a;
+      --granat-2: #06154d;
+      --blekit: #6f96d4;
+      --blekit-wash: #16234a;
+
+      --tlo: #0e131a;
+      --karta: #171e28;
+      --karta-2: #1f2733;
+      --tekst: #e8edf4;
+      --tekst-2: #9daabd;
+      --ramka: #2a3441;
+      --ramka-mocna: #5d6b7f;
+
+      --akcent: #8fb0ee;
+      --akcent-ciemny: #aac6f5;
+      --akcent-tlo: #16234a;
+
+      --w-terminie: #6f9ee0;
+      --blisko: #d9a53a;
+      --po-terminie: #e8737f;
+
+      --blad-tlo: #331d19;
+      --blad-tekst: #f3b6ab;
+      --blad-ramka: #542d25;
+
+      --uwaga-tlo: #2d2018;
+      --uwaga-tekst: #eaba98;
+      --uwaga-ramka: #4d3729;
+
+      --sukces-tlo: #16234a;
+      --sukces-tekst: #aac6f5;
+
+      --cien: none;
+      --cien-naglowka: none;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    padding: var(--p5) var(--p4) var(--p7);
+    background: var(--tlo);
+    color: var(--tekst);
+    font: 16px/1.55 var(--krój-tekstowy);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Jeden, spójny pierścień fokusu na wszystkim, co da się kliknąć. */
+  :focus-visible {
+    outline: 2px solid var(--akcent);
+    outline-offset: 2px;
+    border-radius: var(--zaokraglenie-male);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  /* ── Układ ────────────────────────────────────────────────────────────── */
+
+  .strona {
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  .kolumny {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--p4);
+    align-items: start;
+  }
+
+  @media (min-width: 840px) {
+    .kolumny {
+      grid-template-columns: minmax(0, 1fr) var(--bok);
+      gap: var(--p5);
+    }
+
+    /* Panel odniesienia zostaje w polu widzenia przy długim formularzu.
+       Własne przewijanie, żeby wysoka lista linków nie uciekała poza ekran. */
+    .bok {
+      position: sticky;
+      top: var(--p5);
+      max-height: calc(100vh - var(--p7));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+  }
+
+  /* ── Papier firmowy ───────────────────────────────────────────────────────
+     Narzędzie produkuje pismo urzędowe, więc strona zaczyna się tak, jak
+     zaczyna się blankiet Okręgu: godłem, nazwą i teleadresem.               */
+
+  .blankiet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--p4) var(--p5);
+    /* Serwis Okręgu ma belkę płaską — bez gradientu. */
+    background: var(--granat);
+    border-radius: var(--zaokraglenie);
+    box-shadow: var(--cien-naglowka);
+    padding: var(--p5) var(--p4);
+    margin-bottom: var(--p5);
+    color: #fff;
+  }
+
+  @media (min-width: 480px) {
+    .blankiet { padding: var(--p5) var(--p5) var(--p5) var(--p6); }
+  }
+
+  .blankiet .logo {
+    flex: none;
+    width: 148px;
+    height: auto;
+  }
+
+  .blankiet-tresc { flex: 1 1 240px; min-width: 0; }
+
+  .blankiet h1 {
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    margin: 0 0 var(--p1);
+  }
+
+  .blankiet .jednostka {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #b9c6e6;
+    margin: 0;
+  }
+
+  /* Teleadres jak w stopce blankietu: wersaliki, rozstrzelone, drobne. */
+  .teleadres {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--p1) var(--p4);
+    padding-top: var(--p3);
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #b6c7e0;
+    margin: 0;
+  }
+
+  .teleadres span { white-space: nowrap; }
+
+  /* ── Karty ────────────────────────────────────────────────────────────── */
+
+  .karta {
+    background: var(--karta);
+    border: 1px solid var(--ramka);
+    border-radius: var(--zaokraglenie);
+    padding: var(--p5) var(--p4);
+    margin-bottom: var(--p4);
+    box-shadow: var(--cien);
+  }
+
+  @media (min-width: 480px) {
+    .karta { padding: var(--p5); }
+  }
+
+  /* Prawa kolumna nie jest stosem jednakowych kart. Blok terminów statutowych
+     dostaje jedyne mocne potraktowanie, bo tylko on niesie coś, czego
+     użytkownik sam nie wie: czy cykl narzucony Statutem właśnie upływa.
+     Reszta to zwykłe listy na tle strony, rozdzielone kreską. */
+
+  .bok .karta.zwarta {
+    background: none;
+    border: none;
+    border-top: 1px solid var(--ramka);
+    border-radius: 0;
+    padding: var(--p4) 0 var(--p3);
+    margin: 0;
+  }
+
+  .bok .karta.zwarta:first-child { border-top: none; padding-top: 0; }
+
+  /* Nagłówek karty bocznej: etykieta z lewej, licznik z prawej. */
+  .tytul-boczny {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--p2);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tekst-2);
+    margin: 0 0 var(--p3);
+  }
+
+  .tytul-boczny .liczba {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--tekst-2);
+    background: var(--karta-2);
+    border-radius: 999px;
+    padding: 1px var(--p2);
+  }
+
+  /* ── Pas terminów statutowych ─────────────────────────────────────────────
+     Wskaźnik zamiast zdania: widać na oko, ile z kwartału albo miesiąca
+     zostało. Barwy wypełnień przeszły walidator palety (rozróżnialność przy
+     zaburzeniach widzenia barw i kontrast wobec toru).                      */
+
+  .pas-terminow {
+    background: var(--karta);
+    border: 1px solid var(--ramka);
+    border-radius: var(--zaokraglenie);
+    padding: var(--p4);
+    margin-bottom: var(--p4);
+  }
+
+  @media (min-width: 480px) {
+    .pas-terminow { padding: var(--p5); }
+  }
+
+  .pas-naglowek {
+    display: flex;
+    align-items: center;
+    gap: var(--p3);
+    margin-bottom: var(--p4);
+  }
+
+  .pas-naglowek h2 {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tekst-2);
+    margin: 0;
+  }
+
+  .pas-naglowek .liczba {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--po-terminie);
+    border-radius: 999px;
+    padding: 1px var(--p2);
+  }
+
+  .pas-naglowek .drugi { margin-left: auto; }
+
+  .wskazniki { list-style: none; margin: 0; padding: 0; }
+
+  /* Jeden wiersz na organ: nazwa, tor wskaźnika, stan. Na wąskim ekranie
+     wszystko układa się pionowo. */
+  .wskazniki li {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--p1) var(--p4);
+    padding: var(--p3) 0;
+    border-top: 1px solid var(--ramka);
+  }
+
+  .wskazniki li:first-child { border-top: none; padding-top: 0; }
+
+  @media (min-width: 660px) {
+    .wskazniki li {
+      grid-template-columns: minmax(180px, 15rem) 1fr minmax(150px, auto);
+      align-items: center;
+      gap: var(--p4);
+    }
+  }
+
+  .wskazniki .organ {
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .wskazniki .organ .cykl {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--tekst-2);
+  }
+
+  /* Tor w jaśniejszym kroku tej samej rodziny, żeby stan czytał się
+     przez całą szerokość paska. */
+  .tor {
+    position: relative;
+    height: 8px;
+    background: var(--akcent-tlo);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .tor .wypelnienie {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--w-terminie);
+    transition: width 0.6s ease;
+  }
+
+  .wskazniki li[data-stan="blisko"] .wypelnienie { background: var(--blisko); }
+  .wskazniki li[data-stan="przekroczony"] .wypelnienie { background: var(--po-terminie); }
+
+  .wskazniki .stan {
+    font-size: 0.82rem;
+    color: var(--tekst-2);
+    line-height: 1.35;
+  }
+
+  .wskazniki .stan .etykieta {
+    display: block;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .wskazniki li[data-stan="przekroczony"] .etykieta { color: var(--po-terminie); }
+  .wskazniki li[data-stan="blisko"] .etykieta { color: var(--blisko); }
+  .wskazniki li[data-stan="ok"] .etykieta { color: var(--w-terminie); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tor .wypelnienie { transition: none; }
+  }
+
+  /* ── Pola formularza ──────────────────────────────────────────────────── */
+
+  .pole { margin-bottom: var(--p4); }
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--tekst-2);
+    margin-bottom: var(--p2);
+  }
+
+  label .dodatek {
+    text-transform: none;
+    font-weight: 400;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    min-height: var(--cel-dotyku);
+    padding: 10px var(--p3);
+    font: inherit;
+    color: var(--tekst);
+    background: var(--karta);
+    border: 1px solid var(--ramka-mocna);
+    border-radius: var(--zaokraglenie-male);
+    transition: border-color 0.15s ease;
+  }
+
+  input:hover, textarea:hover, select:hover { border-color: var(--akcent); }
+
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid var(--akcent);
+    outline-offset: -1px;
+    border-color: var(--akcent);
+  }
+
+  select {
+    appearance: none;
+    /* Strzałka rysowana tłem — natywna znika przy appearance: none. */
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: var(--p6);
+  }
+
+  .siatka {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--p3);
+  }
+
+  @media (min-width: 480px) {
+    .siatka { grid-template-columns: 1.4fr 1fr 1fr; }
+  }
+
+  .wskazowka {
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--tekst-2);
+    margin: var(--p2) 0 0;
+  }
+
+  /* Podpowiedź z historii stoi między grupami pól, więc potrzebuje
+     dolnego odstępu — inaczej dotyka etykiety następnego pola. */
+  #zrodlo-podpowiedzi { margin: 0 0 var(--p4); }
+
+  /* ── Zwijane sekcje ───────────────────────────────────────────────────── */
+
+  details {
+    background: var(--karta-2);
+    border: 1px solid var(--ramka);
+    border-radius: var(--zaokraglenie-male);
+    margin-bottom: var(--p4);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    gap: var(--p2);
+    min-height: var(--cel-dotyku);
+    padding: var(--p2) var(--p3);
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--tekst);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker { display: none; }
+
+  /* Trójkąt obracany przy rozwinięciu — czytelny stan otwarte/zamknięte. */
+  summary::before {
+    content: '';
+    flex: none;
+    width: 0;
+    height: 0;
+    border-left: 5px solid currentColor;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    transition: transform 0.15s ease;
+  }
+
+  details[open] > summary::before { transform: rotate(90deg); }
+
+  summary .licznik {
+    margin-left: auto;
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: var(--tekst-2);
+    text-align: right;
+  }
+
+  .tresc-zwijana { padding: 0 var(--p3) var(--p3); }
+
+  /* ── Wymogi Statutu ───────────────────────────────────────────────────────
+     Krecha w błękicie z godła i maszynowy krój przy paragrafach — odwołanie
+     do Statutu jest tu daną, na której opiera się reszta pisma.             */
+
+  /* Wcześniej stała tu kolorowa krecha 3 px z lewej. Wypadła: to najczęściej
+     wymieniany pojedynczy znak interfejsu generowanego maszynowo. Odwołanie
+     do paragrafu wyróżnia teraz sam krój maszynowy i pozycja w nagłówku. */
+  .wymogi { background: var(--karta-2); }
+
+  #wymogi-podsumowanie {
+    font-family: var(--krój-maszynowy);
+    font-size: 0.75rem;
+    color: var(--akcent);
+  }
+
+  .wymogi dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    font-size: 0.85rem;
+  }
+
+  @media (min-width: 480px) {
+    .wymogi dl { grid-template-columns: max-content 1fr; gap: var(--p2) var(--p4); }
+  }
+
+  .wymogi dt { font-weight: 600; color: var(--tekst); }
+  .wymogi dd { margin: 0 0 var(--p2); color: var(--tekst-2); }
+
+  .wymogi dd.paragraf {
+    font-family: var(--krój-maszynowy);
+    font-size: 0.8rem;
+    color: var(--akcent);
+  }
+
+  @media (min-width: 480px) {
+    .wymogi dd { margin: 0; }
+  }
+
+  /* ── Komunikaty ───────────────────────────────────────────────────────── */
+
+  .komunikat {
+    border: 1px solid transparent;
+    border-radius: var(--zaokraglenie-male);
+    padding: var(--p3) var(--p4);
+    margin-bottom: var(--p4);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .komunikat.blad {
+    background: var(--blad-tlo);
+    color: var(--blad-tekst);
+    border-color: var(--blad-ramka);
+  }
+
+  .komunikat.uwaga {
+    background: var(--uwaga-tlo);
+    color: var(--uwaga-tekst);
+    border-color: var(--uwaga-ramka);
+  }
+
+  .komunikat ul { margin: 0; padding-left: var(--p4); }
+  .komunikat li + li { margin-top: var(--p2); }
+
+  /* Status wyprzedzenia pod datą — znak niesie tę samą treść co kolor,
+     żeby komunikat działał też przy zaburzeniach widzenia barw. */
+  .status {
+    display: flex;
+    gap: var(--p2);
+    font-size: 0.84rem;
+    margin: 0 0 var(--p4);
+  }
+  .status .znak { flex: none; font-weight: 700; }
+  .status.ok { color: var(--akcent); }
+  .status.ostrzezenie { color: var(--uwaga-tekst); }
+
+  /* ── Przyciski ────────────────────────────────────────────────────────── */
+
+  button {
+    font: inherit;
+    font-weight: 600;
+    min-height: var(--cel-dotyku);
+    border: 1px solid transparent;
+    border-radius: var(--zaokraglenie-male);
+    padding: 10px var(--p4);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  button:disabled { opacity: 0.55; cursor: progress; }
+
+  .glowny {
+    background: var(--akcent);
+    color: #fff;
+    width: 100%;
+  }
+  .glowny:hover:not(:disabled) { background: var(--akcent-ciemny); }
+
+  @media (prefers-color-scheme: dark) {
+    /* Napis w granacie, nie w czerni — ta sama rodzina co blankiet. */
+    .glowny { color: #0d1826; }
+  }
+
+  .drugi {
+    background: transparent;
+    color: var(--akcent);
+    border-color: var(--ramka-mocna);
+    padding: var(--p2) var(--p3);
+    font-size: 0.86rem;
+    min-height: 36px;
+  }
+  .drugi:hover:not(:disabled) { border-color: var(--akcent); background: var(--akcent-tlo); }
+
+  .szeroki { width: 100%; margin-top: var(--p3); }
+
+  /* ── Wynik ────────────────────────────────────────────────────────────── */
+
+  .podsumowanie {
+    background: var(--sukces-tlo);
+    border-radius: var(--zaokraglenie-male);
+    padding: var(--p4);
+    margin-bottom: var(--p4);
+  }
+
+  .podsumowanie strong {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--sukces-tekst);
+    line-height: 1.35;
+  }
+
+  .podsumowanie strong:focus { outline: none; }
+
+  .podsumowanie .termin {
+    display: block;
+    color: var(--tekst-2);
+    font-size: 0.88rem;
+    margin-top: var(--p1);
+  }
+
+  .pasek {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--p3);
+    margin-bottom: var(--p2);
+  }
+
+  .pasek h3 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--tekst-2);
+    margin: 0;
+  }
+
+  #wynik-tekst, #podglad-tekst {
+    min-height: 320px;
+    resize: vertical;
+    font-family: var(--krój-maszynowy);
+    font-size: 0.84rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+  }
+
+  #porzadek {
+    min-height: 160px;
+    resize: vertical;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  a { color: var(--akcent); }
+  a:hover { color: var(--akcent-ciemny); }
+
+  .link-meet {
+    display: block;
+    font-family: var(--krój-maszynowy);
+    font-size: 0.86rem;
+    word-break: break-all;
+    margin-bottom: var(--p4);
+  }
+
+  /* ── Listy ────────────────────────────────────────────────────────────── */
+
+  ul.lista { list-style: none; margin: 0; padding: 0; }
+
+  ul.lista li {
+    padding: var(--p3) 0;
+    border-top: 1px solid var(--ramka);
+    font-size: 0.92rem;
+  }
+  ul.lista li:first-child { border-top: none; padding-top: 0; }
+
+  ul.lista .opis {
+    display: block;
+    color: var(--tekst-2);
+    font-size: 0.84rem;
+    margin-top: 2px;
+  }
+
+  /* W prawej kolumnie listy są ciaśniejsze i mniejsze. */
+  .zwarta ul.lista li { padding: var(--p2) 0; font-size: 0.88rem; }
+  .zwarta ul.lista .opis { font-size: 0.8rem; }
+
+  /* Wiersz dodatku: pole wyboru i nazwa w jednej linii, reszta pod spodem. */
+  label.dodatek {
+    display: flex;
+    align-items: center;
+    gap: var(--p2);
+    min-height: var(--cel-dotyku);
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--tekst);
+    cursor: pointer;
+  }
+
+  label.dodatek input {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    accent-color: var(--akcent);
+  }
+
+  label.dodatek .nazwa { font-weight: 600; }
+
+  li[aria-busy='true'] .stan-dodatku { opacity: 0.7; }
+
+  /* Akcja przy pozycji listy, na przykład „Dokończ” przy posiedzeniu. */
+  ul.lista .akcja {
+    background: none;
+    border: none;
+    padding: 0;
+    min-height: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--akcent);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .plakietka {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--uwaga-tlo);
+    color: var(--uwaga-tekst);
+    border: 1px solid var(--uwaga-ramka);
+    border-radius: var(--p1);
+    padding: 1px 6px;
+    margin-right: var(--p2);
+  }
+
+  /* Termin ze Statutu minął — to jedyny stan, który ma boleć. */
+  .plakietka.pilne {
+    background: var(--blad-tlo);
+    color: var(--blad-tekst);
+    border-color: var(--blad-ramka);
+  }
+
+  .plakietka.spokojna {
+    background: var(--akcent-tlo);
+    color: var(--sukces-tekst);
+    border-color: var(--ramka);
+  }
+
+  /* Pozycja listy bez odnośnika — stan cyklu statutowego. */
+  ul.lista .nazwa { font-weight: 600; }
+
+  .pusto {
+    color: var(--tekst-2);
+    font-size: 0.86rem;
+    margin: 0;
+    padding: var(--p2) 0;
+  }
+
+  /* Placeholder na czas wczytywania listy — pokazuje, że coś się dzieje. */
+  .szkielet {
+    height: 12px;
+    border-radius: var(--p1);
+    background: var(--karta-2);
+    margin: var(--p3) 0;
+    animation: puls 1.4s ease-in-out infinite;
+  }
+  .szkielet.krotki { width: 55%; }
+
+  @keyframes puls { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+  /* ── Stopka ───────────────────────────────────────────────────────────── */
+
+  .stopka {
+    color: var(--tekst-2);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    text-align: center;
+    margin: var(--p5) 0 0;
+    padding-top: var(--p4);
+    border-top: 1px solid var(--ramka);
+  }
+
+  /* Treść wyłącznie dla czytników ekranu. */
+  .tylko-czytnik {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Odnośnik pomijający — pierwszy w kolejności tabulacji, widoczny po fokusie. */
+  .pomin {
+    position: absolute;
+    left: -9999px;
+    top: var(--p2);
+    background: var(--karta);
+    border: 1px solid var(--akcent);
+    border-radius: var(--zaokraglenie-male);
+    padding: var(--p2) var(--p3);
+    font-size: 0.86rem;
+    font-weight: 600;
+    z-index: 10;
+  }
+  .pomin:focus { left: var(--p4); }
+</style>
+
+<a class="pomin" href="#formularz">Przejdź do formularza</a>
+
+<div class="strona">
+
+  <header class="blankiet">
+    <svg xmlns="http://www.w3.org/2000/svg" class="logo" role="img" aria-label="Polski Związek Wędkarski" viewBox="0 0 185.004 80"><g transform="translate(-256 -298)"><text transform="translate(360.004 328)" fill="#fff" font-size="13" font-family="Helvetica-Bold, Helvetica" font-weight="700"><tspan x="0" y="0">POLSKI</tspan><tspan x="0" y="16">ZWIĄZEK</tspan><tspan x="0" y="32">WĘDKARSKI</tspan></text><g transform="translate(256.004 298)"><rect width="83.673" height="79.963" fill="none"/><path d="M6.67,0h.7L8,.141l.631.141L9.26.49l.556.283.565.283.49.424.49.424.424.565.424.49.349.565.283.556.207.631.141.631.066.631V7.3l-.066.7-.141.631-.207.565-.283.565-.349.565-.424.49-.424.565-.49.424-.49.424-.565.283-.556.283L8.629,13,8,13.142l-.631.141h-1.4l-.631-.141L4.7,13l-.631-.207L3.5,12.511l-.565-.283-.49-.424-.49-.424-.424-.565-.424-.49L.763,9.76.48,9.195.273,8.629.132,8,.066,7.3,0,6.67l.066-.7.066-.631L.273,4.71.48,4.079l.283-.556.349-.565.424-.49L1.959,1.9l.49-.424.49-.424L3.5.772,4.07.49,4.7.283,5.332.141,5.963,0h.7Zm5.747,6.651L12.35,6.02l-.066-.565-.141-.49L12,4.4l-.283-.49-.283-.49L11.088,3l-.349-.424-.424-.424L9.826,1.8,9.4,1.517l-.556-.207L8.356,1.1,7.791.961,7.235.895H6.048L5.483.961l-.49.141-.565.207-.49.207-.49.283-.424.349L2.6,2.572,2.252,3,1.9,3.42l-.283.49-.283.49L1.2,4.965l-.141.49L.989,6.02l-.066.631.066.565.066.565.141.565.141.49.283.49.283.49.349.424.349.424.424.424.424.349.49.283.49.207.565.207.49.141.565.066H7.235l.556-.066.565-.141.49-.207.556-.207.424-.283.49-.349.424-.424.349-.424.349-.424.283-.49L12,8.837l.141-.49.141-.565.066-.565Zm-8.055,3.5V3.081H6.952l.207.066h.207l.141.066h.207l.207.141.141.066.141.141.207.141.141.141.066.141.141.207.066.141.066.207v.207l.066.141v.424l-.066.207v.207l-.066.207-.066.141-.141.207-.141.141-.141.141-.283.283-.141.066-.207.066.631,1.545.631,1.611H7.706l-.565-1.47L6.51,7.2H5.389v2.939H4.333Zm3.57-5.049V4.965l-.066-.207L7.8,4.616l-.141-.207-.141-.066L7.31,4.2l-.141-.066H5.417V6.171H6.962L7.169,6.1H7.31l.207-.141L7.659,5.9,7.8,5.69l.075-.141.066-.207V5.134" transform="translate(4.242 66.717)" fill="#fff" fill-rule="evenodd"/><path d="M13.272,2.252A110.875,110.875,0,0,1,24.157,8.045,106.7,106.7,0,0,1,37.1,17.494c10.057-.236,14.6,1.008,20.942,2.1a24.386,24.386,0,0,0-.085,4.051c.132.5.235,1.168.377,1.667l.377.923a9.027,9.027,0,0,1,1.149,2.751c-.33.33-.734.3-1.874.386a1.914,1.914,0,0,0,0,1.036A19.344,19.344,0,0,0,65.72,32.1c11.554.311,11.215-10.344,16.168-16.731.829-.942,1.431-1.008,1.789-.961a30.692,30.692,0,0,1-.508,6.689l-2.608,3.665c-1.224,1.762-.4,1.14,1.252.97.245.782-.132,2.732-1.2,5.36-2.222,5.568-3.107,7.169-6.61,10.334a18.666,18.666,0,0,1-10.885,5.5c-2.363.028-5.2-.038-8.974.32a4.5,4.5,0,0,1-1.026-1.818c0-.33-.829-.226-1.055-.226-.819.236,2.006,4.691,2.053,6.519a11.441,11.441,0,0,1-2.665-.009c-3.154-2.779-6.045-4.87-8.371-6.821-2.4-2.129-2.881-2.233-6.13-2.572-2.589-.415-6.62-3.552-8.541-3.5-.056-.942-.226-2.157-.2-2.883-.9,0-1.591-.113-1.591-.075,0,.33.056,3.335.113,4.955-.273-.217-1.4-.339-1.921-1.187a32.325,32.325,0,0,1-6-6.726c-.245-.82-.339-2.544-.584-3.957-2.288-2.167-4.6-3.42-6.6-5.087C5.315,18.935,2.387,13.6.381,7.216c-1.234-4.023.838-9.091,1.817-3.4,1.318,1.272,1.742,2.449,2.5,4.512a30.05,30.05,0,0,0,1.9,3.891c.226.669,1.008-2.553-.226-5.276-.885-2.12-3.927-5.558-3.654-6.5A2.051,2.051,0,0,1,3.922,0a30.824,30.824,0,0,1,9.332,2.261ZM6.577,3.42a16.4,16.4,0,0,1,2.571,7.555c.48,1.818-.264,4.663.96,5.247,2.514.217,2.787-1.451,2.674-2.892A9.392,9.392,0,0,0,11.925,9.9c-.8-1.234-1.6-3-2.09-3.693L8.5,4.39C8.178,3.966,7.641,3.156,7.161,3c-.8-.273-.96.537-.593.424Zm7.815,7.367A2.469,2.469,0,1,0,16.86,8.4a2.429,2.429,0,0,0-2.467,2.383Zm-.424,9.26a8.676,8.676,0,0,0,7.053-.7,6.79,6.79,0,0,0,3.889-3.938c.217-2.666-2.147.772-2.966,1.253a9.565,9.565,0,0,1-3.654,1.244c-2.241.386-6.139-1.4-5.763.594a2.824,2.824,0,0,0,1.441,1.536ZM28.018,23.8l.367,2.572-2.4.32.2,1.47,2.42-.32.348,2.449,1.469-.207-.339-2.44,2.411-.32-.2-1.47-2.42.32-.367-2.591-1.469.207Zm6.93,5.389.734,2.5-2.335.669.4,1.423L36.1,33.1l.7,2.374,1.422-.415-.7-2.365,2.335-.669-.4-1.423-2.345.669-.734-2.506-1.422.415Zm5.932,4.352.913,2.44-2.279.838.508,1.394,2.288-.838.866,2.317,1.384-.518L43.7,36.863l2.279-.838-.508-1.394-2.3.838-.923-2.449-1.384.518Zm6.422,3.58,1.5,1.667-1.563,1.385.847.951,1.563-1.385,1.422,1.583.951-.848L50.607,38.9l1.563-1.385-.847-.951-1.573,1.394-1.5-1.667-.942.848Zm6.78,1.818,1.139,1.46-1.365,1.055.64.838,1.375-1.055,1.083,1.385.829-.65-1.073-1.385,1.365-1.055-.64-.838-1.375,1.055-1.139-1.46-.829.65Zm6.158.565,1.412,1.187L60.532,42l.8.688,1.121-1.319L63.8,42.5l.678-.8-1.337-1.13,1.121-1.319-.8-.678-1.13,1.319-1.422-1.2-.678.81" transform="translate(-0.004 27.236)" fill="#fff" fill-rule="evenodd"/><path d="M0,29c1.526-4.786,3.184-9.722,4.691-14.574S7.81,4.772,9.421.014c.961.019,1.884.038,2.836.019A43.52,43.52,0,0,1,16.693.08c2.5.226,4.39,1.62,4.541,4.315a8.13,8.13,0,0,1-.188,2.327l-.292,1.5c-.716,3.241-1.771,5.747-2.788,8.912-1.017,3.128-3.335,4.626-5.935,4.437L6.868,21.54,4.239,28.973l-4.22.019ZM12.124,4.244,7.942,17.169h3.646a5.286,5.286,0,0,0,.546,0l.264-.028.207-.028a1.434,1.434,0,0,0,.716-.433h.019l.019-.038a1.284,1.284,0,0,0,.1-.132,2.132,2.132,0,0,0,.245-.4l.132-.2.367-.829.678-2.035.82-2.478.688-2.506.424-1.6.057-.254L16.9,6a1.385,1.385,0,0,0-.876-1.743c-.33-.009-.707-.019-1.046-.019H12.134" transform="translate(25.89 6.156)" fill="#fff" fill-rule="evenodd"/><path d="M6.962,37.88l21.13.019-2.2,4L0,41.978,12.6,19.8l.49-13.481,3.881-.028-.151,6.01,4.626-8.1H7.094L8.8,0h19.52L16.552,20.886l-.075,4.437L27.32,6.331l4.465-.085-1.7,19.048L39.058,6.3l4.814-.085L29.9,35.308l-4.512-.019,1.79-20.151L16.024,35.327l-3.9.009.254-7.056Z" transform="translate(35.375)" fill="#fff" fill-rule="evenodd"/><path d="M14.508,1.131l2.412,9.185a17.284,17.284,0,0,1,.339,5.709A65.033,65.033,0,0,0,18.5,27.481c-2.487,1.733-4.428,5.4-5.332,8.215-1.894,4.484-2.864,5.841-5.341,8.036-2.186.961-5.285.659-4.654.349,1.159-1.488,3.486-4.644,4.965-6.491.97-1.6.791.584,2.534-.528,1.168-4.494-3.467-7.81-6.849-8.865a9.072,9.072,0,0,0-1.507-.019C1.2,28.319.132,29.412.01,28.885a8.027,8.027,0,0,1,1.14-3.071l1.46-2.289,2.967-4.079c2.638-3.523,5.031-7,5.831-11.258l1.488-5.8C13.472-.668,13.9-.442,14.508,1.122" transform="translate(63.438 12.657)" fill="#fff" fill-rule="evenodd"/></g></g></svg>
+    <div class="blankiet-tresc">
+      <h1>Generator posiedzeń</h1>
+      <p class="jednostka" id="marka">Okręg Mazowiecki Polskiego Związku Wędkarskiego w Warszawie</p>
+    </div>
+    <p class="teleadres" id="teleadres"></p>
+  </header>
+
+  <!-- ── Terminy statutowe ─────────────────────────────────────────────────
+       Pas na pełną szerokość, nad pracą. To jedyna rzecz, której użytkownik
+       sam nie wie: ile z cyklu narzuconego Statutem już upłynęło.          -->
+  <section class="pas-terminow" id="pas-terminow" aria-labelledby="tytul-cyklu">
+    <div class="pas-naglowek">
+      <h2 id="tytul-cyklu">Terminy statutowe</h2>
+      <span class="liczba" id="liczba-zaleglosci" hidden></span>
+      <button type="button" class="drugi" id="przycisk-przypomnienia" hidden></button>
+    </div>
+
+    <ul class="wskazniki" id="lista-cyklu"></ul>
+
+    <div id="ladowanie-cyklu" aria-hidden="true">
+      <div class="szkielet"></div><div class="szkielet krotki"></div>
+    </div>
+    <p class="pusto" id="brak-cyklu" hidden>
+      Statut nie narzuca cyklu żadnemu z tych organów.
+    </p>
+    <p class="wskazowka" id="wskazowka-przypomnien" hidden></p>
+  </section>
+
+  <div class="kolumny">
+
+    <!-- ── Kolumna główna ──────────────────────────────────────────────── -->
+    <main>
+
+      <div id="blad" class="komunikat blad" role="alert" hidden></div>
+
+      <section id="widok-formularza" aria-labelledby="tytul-formularza">
+        <form class="karta" id="formularz" novalidate>
+
+          <h2 class="tytul-karty" id="tytul-formularza">Nowe posiedzenie</h2>
+
+          <div class="pole">
+            <label for="rodzaj">Rodzaj posiedzenia</label>
+            <select id="rodzaj" name="rodzaj"></select>
+          </div>
+
+          <details class="wymogi" id="wymogi">
+            <summary>
+              Co mówi Statut
+              <span class="licznik" id="wymogi-podsumowanie"></span>
+            </summary>
+            <div class="tresc-zwijana">
+              <dl id="wymogi-tresc"></dl>
+            </div>
+          </details>
+
+          <div class="pole">
+            <label for="tytul">Tytuł wydarzenia</label>
+            <input type="text" id="tytul" name="tytul" autocomplete="off">
+          </div>
+
+          <div class="siatka">
+            <div class="pole">
+              <label for="data">Data</label>
+              <input type="date" id="data" name="data" required>
+            </div>
+            <div class="pole">
+              <label for="godzina">
+                Godzina <span class="dodatek" id="etykieta-godziny"></span>
+              </label>
+              <input type="time" id="godzina" name="godzina">
+            </div>
+            <div class="pole">
+              <label for="czasTrwania">Czas <span class="dodatek">(min)</span></label>
+              <input type="number" id="czasTrwania" name="czasTrwania"
+                     min="15" step="15" inputmode="numeric">
+            </div>
+          </div>
+
+          <p class="status" id="status-terminu" role="status" hidden>
+            <span class="znak" aria-hidden="true"></span>
+            <span class="tresc"></span>
+          </p>
+
+          <p class="wskazowka" id="zrodlo-podpowiedzi" hidden></p>
+
+          <div class="pole">
+            <label for="miejsce">Miejsce obrad <span class="dodatek">— opcjonalnie</span></label>
+            <input type="text" id="miejsce" name="miejsce" autocomplete="off"
+                   placeholder="np. Biuro Okręgu, ul. Retmańska 75, Serock"
+                   aria-describedby="wskazowka-miejsca">
+            <p class="wskazowka" id="wskazowka-miejsca"></p>
+          </div>
+
+          <div class="pole" id="pole-zwolujacego" hidden>
+            <label for="zwolujacy">Zwołuje i podpisuje</label>
+            <select id="zwolujacy" name="zwolujacy"
+                    aria-describedby="wskazowka-zwolujacego"></select>
+            <p class="wskazowka" id="wskazowka-zwolujacego"></p>
+          </div>
+
+          <details id="szczegoly-porzadku">
+            <summary>
+              Porządek obrad
+              <span class="licznik" id="licznik-punktow"></span>
+            </summary>
+            <div class="tresc-zwijana">
+              <label class="tylko-czytnik" for="porzadek">
+                Porządek obrad, jeden punkt w wierszu
+              </label>
+              <textarea id="porzadek" name="porzadek" spellcheck="false"></textarea>
+              <p class="wskazowka">
+                Szkic zgodny ze Statutem — dopisz lub skreśl punkty. Jeden punkt w wierszu.
+              </p>
+            </div>
+          </details>
+
+          <button type="submit" class="glowny" id="przycisk-utworz">
+            Pokaż zawiadomienie
+          </button>
+          <p class="wskazowka">
+            Zobaczysz gotowy tekst do przeczytania. W kalendarzu nic jeszcze
+            nie powstanie.
+          </p>
+        </form>
+      </section>
+
+      <!-- ── Podgląd ─────────────────────────────────────────────────────
+           Zawiadomienie czyta się i poprawia, zanim cokolwiek trafi do
+           kalendarza. W kalendarzu nie ma jeszcze nic, więc z tego widoku
+           można wrócić bez śladu.                                          -->
+      <section id="widok-podgladu" class="karta" aria-labelledby="podglad-tytul" hidden>
+
+        <div class="podsumowanie">
+          <strong id="podglad-tytul" tabindex="-1"></strong>
+          <span class="termin" id="podglad-termin"></span>
+        </div>
+
+        <div class="komunikat uwaga" id="podglad-uwagi" role="status" hidden>
+          <ul id="podglad-uwagi-lista"></ul>
+        </div>
+
+        <div class="pasek">
+          <h3 id="etykieta-podgladu">Przeczytaj i popraw zawiadomienie</h3>
+          <button type="button" class="drugi" id="przycisk-zloz-od-nowa"
+                  aria-describedby="etykieta-podgladu">Ułóż treść od nowa</button>
+        </div>
+        <label class="tylko-czytnik" for="podglad-tekst">Treść zawiadomienia</label>
+        <textarea id="podglad-tekst" spellcheck="false"></textarea>
+        <p class="wskazowka" id="wskazowka-podgladu"></p>
+
+        <button type="button" class="glowny szeroki" id="przycisk-zaloz">
+          Utwórz wydarzenie w kalendarzu
+        </button>
+        <button type="button" class="drugi szeroki" id="przycisk-wroc">
+          Wróć do formularza
+        </button>
+      </section>
+
+      <section id="widok-wyniku" class="karta" aria-labelledby="wynik-tytul" hidden>
+
+        <div class="podsumowanie">
+          <strong id="wynik-tytul" tabindex="-1"></strong>
+          <span class="termin" id="wynik-termin"></span>
+        </div>
+
+        <div class="komunikat uwaga" id="uwagi" role="status" hidden>
+          <ul id="uwagi-lista"></ul>
+        </div>
+
+        <div id="sekcja-linku">
+          <div class="pasek">
+            <h3 id="etykieta-linku">Link do Google Meet</h3>
+            <button type="button" class="drugi" id="przycisk-kopiuj-link"
+                    aria-describedby="etykieta-linku">Kopiuj link</button>
+          </div>
+          <a class="link-meet" id="wynik-link" target="_blank" rel="noopener"></a>
+        </div>
+
+        <div id="sekcja-tresci">
+          <div class="pasek">
+            <h3 id="etykieta-tekstu">Zawiadomienie do wklejenia w maila</h3>
+            <button type="button" class="drugi" id="przycisk-kopiuj-tekst"
+                    aria-describedby="etykieta-tekstu">Kopiuj tekst</button>
+          </div>
+          <label class="tylko-czytnik" for="wynik-tekst">Treść zawiadomienia</label>
+          <textarea id="wynik-tekst" spellcheck="false"></textarea>
+          <p class="wskazowka" id="wskazowka-wyniku">
+            Możesz poprawić tekst przed skopiowaniem.
+            <a id="wynik-wydarzenie" target="_blank" rel="noopener">Otwórz w Kalendarzu Google</a>
+          </p>
+
+          <button type="button" class="drugi szeroki" id="przycisk-mail" hidden></button>
+        </div>
+        <section id="sekcja-dodatkow" aria-labelledby="etykieta-dodatkow" hidden>
+          <div class="pasek">
+            <h3 id="etykieta-dodatkow">Dodatki</h3>
+            <button type="button" class="drugi" id="przycisk-dodatki"
+                    aria-describedby="etykieta-dodatkow">Dopnij zaznaczone</button>
+          </div>
+          <ul class="lista" id="lista-dodatkow"></ul>
+          <p class="wskazowka">
+            Posiedzenie jest już zwołane i nic z tej listy nie jest do tego
+            potrzebne. Możesz dopiąć te rzeczy teraz albo później, przyciskiem
+            „Dokończ” przy posiedzeniu na liście najbliższych.
+          </p>
+        </section>
+
+        <button type="button" class="glowny szeroki" id="przycisk-nowe">
+          Zaplanuj kolejne posiedzenie
+        </button>
+
+        <p class="tylko-czytnik" role="status" id="komunikat-kopiowania"></p>
+      </section>
+
+    </main>
+
+    <!-- ── Panel odniesienia ───────────────────────────────────────────── -->
+    <aside class="bok" aria-label="Panel odniesienia">
+
+      <section class="karta zwarta" aria-labelledby="tytul-nadchodzacych">
+        <h2 class="tytul-boczny" id="tytul-nadchodzacych">
+          Najbliższe posiedzenia
+          <span class="liczba" id="liczba-nadchodzacych" hidden></span>
+        </h2>
+        <ul class="lista" id="lista-nadchodzacych"></ul>
+        <div id="ladowanie-nadchodzacych" aria-hidden="true">
+          <div class="szkielet"></div><div class="szkielet krotki"></div>
+        </div>
+        <p class="pusto" id="brak-nadchodzacych" hidden>Brak zaplanowanych posiedzeń.</p>
+      </section>
+
+      <!-- Zwołane posiedzenie bywa trzeba przesunąć albo odwołać; link Meet
+           zostaje ten sam, więc rozesłany wcześniej adres dalej działa. -->
+      <section class="karta zwarta" id="karta-zmiany" aria-labelledby="tytul-zmiany" hidden>
+        <h2 class="tytul-boczny" id="tytul-zmiany">Zmiana terminu</h2>
+
+        <div class="pole">
+          <label class="tylko-czytnik" for="zmiana-posiedzenie">Posiedzenie</label>
+          <select id="zmiana-posiedzenie"></select>
+        </div>
+
+        <div class="pole">
+          <label for="zmiana-powod">Przyczyna <span class="dodatek">— opcjonalnie</span></label>
+          <input type="text" id="zmiana-powod" autocomplete="off"
+                 placeholder="np. brak kworum">
+        </div>
+
+        <details id="szczegoly-przeniesienia">
+          <summary>Nowy termin</summary>
+          <div class="tresc-zwijana">
+            <div class="pole">
+              <label for="zmiana-data">Data</label>
+              <input type="date" id="zmiana-data">
+            </div>
+            <div class="pole">
+              <label for="zmiana-godzina">Godzina</label>
+              <input type="time" id="zmiana-godzina">
+            </div>
+            <button type="button" class="drugi szeroki" id="przycisk-przenies">
+              Przenieś posiedzenie
+            </button>
+          </div>
+        </details>
+
+        <button type="button" class="drugi szeroki" id="przycisk-odwolaj">
+          Odwołaj posiedzenie
+        </button>
+      </section>
+
+      <section class="karta zwarta" aria-labelledby="tytul-minionych">
+        <h2 class="tytul-boczny" id="tytul-minionych">
+          Ostatnie posiedzenia
+          <span class="liczba" id="liczba-minionych" hidden></span>
+        </h2>
+        <ul class="lista" id="lista-minionych"></ul>
+        <div id="ladowanie-minionych" aria-hidden="true">
+          <div class="szkielet"></div><div class="szkielet krotki"></div>
+        </div>
+        <p class="pusto" id="brak-minionych" hidden>Brak wcześniejszych posiedzeń.</p>
+      </section>
+
+      <section class="karta zwarta" aria-labelledby="tytul-linkow">
+        <h2 class="tytul-boczny" id="tytul-linkow">Przydatne linki</h2>
+        <ul class="lista" id="lista-linkow"></ul>
+        <p class="pusto" id="brak-linkow" hidden>Nie skonfigurowano żadnych linków.</p>
+      </section>
+
+      <section class="karta zwarta" aria-labelledby="tytul-narzedzi">
+        <h2 class="tytul-boczny" id="tytul-narzedzi">Narzędzia</h2>
+
+        <details id="szczegoly-planu">
+          <summary>Plan roczny</summary>
+          <div class="tresc-zwijana">
+            <p class="wskazowka">
+              Statut narzuca rytm, nie daty. Narzędzie proponuje terminy na cały
+              rok i omija dni ustawowo wolne. Powstają zapowiedzi, nie zwołane
+              posiedzenia.
+            </p>
+
+            <div class="pole">
+              <label for="plan-rodzaj">Gremium</label>
+              <select id="plan-rodzaj"></select>
+            </div>
+
+            <div class="pole">
+              <label for="plan-rok">Rok</label>
+              <input type="number" id="plan-rok" min="2026" max="2099" step="1">
+            </div>
+
+            <button type="button" class="drugi szeroki" id="przycisk-plan-propozycja">
+              Zaproponuj terminy
+            </button>
+
+            <ul class="lista" id="lista-planu"></ul>
+
+            <button type="button" class="drugi szeroki" id="przycisk-plan-zapis" hidden>
+              Wpisz zaznaczone do kalendarza
+            </button>
+          </div>
+        </details>
+
+        <details id="szczegoly-rejestru">
+          <summary>
+            Rejestr uchwał
+            <span class="licznik" id="licznik-uchwal"></span>
+          </summary>
+          <div class="tresc-zwijana">
+            <div class="pole">
+              <label for="uchwala-rodzaj">Organ</label>
+              <select id="uchwala-rodzaj"></select>
+            </div>
+
+            <div class="pole">
+              <label for="uchwala-data">Data posiedzenia</label>
+              <input type="date" id="uchwala-data">
+            </div>
+
+            <div class="pole">
+              <label for="uchwala-przedmiot">Przedmiot uchwały</label>
+              <input type="text" id="uchwala-przedmiot" autocomplete="off">
+            </div>
+
+            <label class="dodatek" for="uchwala-podlega">
+              <input type="checkbox" id="uchwala-podlega">
+              <span class="nazwa">Podlega przedłożeniu Zarządowi Okręgu</span>
+            </label>
+            <p class="wskazowka" id="wskazowka-uchwaly">
+              Dotyczy spraw z § 47 pkt 3–14, 23–25 i 27 (§ 48 ust. 2).
+            </p>
+
+            <button type="button" class="drugi szeroki" id="przycisk-uchwala">
+              Dopisz uchwałę
+            </button>
+
+            <ul class="lista" id="lista-uchwal"></ul>
+            <p class="pusto" id="brak-uchwal" hidden>Rejestr jest pusty.</p>
+          </div>
+        </details>
+      </section>
+
+    </aside>
+
+  </div>
+
+  <footer class="stopka" id="stopka"></footer>
+
+</div>
+
+<script>
+  const el = (id) => document.getElementById(id);
+
+  /**
+   * google.script.run nie zwraca Promise, więc opakowujemy je raz
+   * i dalej piszemy zwykłym async/await.
+   */
+  function serwer(nazwa, ...argumenty) {
+    return new Promise(function (spelnij, odrzuc) {
+      google.script.run
+        .withSuccessHandler(spelnij)
+        .withFailureHandler(odrzuc)[nazwa](...argumenty);
+    });
+  }
+
+  let domyslne = {};
+  let rodzaje = [];
+
+  /** Ustawienia z ostatniego posiedzenia każdego rodzaju: rodzaj → {godzina, …}. */
+  let ostatnie = {};
+
+  let tematMaila = '';
+
+  /**
+   * Znacznik miejsca na link Meet. Musi być identyczny jak MIEJSCE_NA_LINK
+   * w Kod.gs — po nim podmieniamy adres, gdy konferencja dojdzie z opóźnieniem.
+   */
+  const MIEJSCE_NA_LINK = '[tutaj wejdzie link do Google Meet]';
+
+  /** Dane formularza zamrożone w chwili złożenia podglądu. */
+  let danePodgladu = null;
+
+  /** Wydarzenie utworzone przed chwilą — pod protokół. */
+  let idOstatniegoWydarzenia = '';
+
+  // ── Start ────────────────────────────────────────────────────────────────
+
+  wczytajKonfiguracje();
+  odswiezNadchodzace();
+  odswiezMinione();
+  odswiezStanCyklu();
+  odswiezDoZmiany();
+
+  async function wczytajKonfiguracje() {
+    try {
+      const dane = await serwer('pobierzDomyslne');
+
+      domyslne = dane;
+      rodzaje = dane.rodzaje;
+
+      el('marka').textContent = dane.okreg.nazwa;
+
+      // Teleadres w blankiecie; każdy człon osobno, żeby nie łamał się w środku.
+      const teleadres = el('teleadres');
+      teleadres.innerHTML = '';
+      [dane.okreg.adres].concat(dane.okreg.telefony).forEach(function (czlon) {
+        const element = document.createElement('span');
+        element.textContent = czlon;
+        teleadres.appendChild(element);
+      });
+
+      el('stopka').textContent = 'Kadencja ' + dane.kadencja +
+        ' · Statut PZW, tekst jednolity z 15 marca 2017 r.';
+
+      rodzaje.forEach(function (rodzaj) {
+        const opcja = document.createElement('option');
+        opcja.value = rodzaj.id;
+        opcja.textContent = rodzaj.nazwa;
+        el('rodzaj').appendChild(opcja);
+      });
+
+      wypelnijZwolujacych(dane.zwolujacy || {});
+
+      el('rodzaj').value = dane.domyslnyRodzaj;
+      wyczyscFormularz();
+      pokazLinki(dane.linki || []);
+      przygotujPrzypomnienia(dane.przypomnienia || {});
+      przygotujPlan();
+      przygotujRejestr();
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    }
+  }
+
+  // ── Formularz ────────────────────────────────────────────────────────────
+
+  function wybranyRodzaj() {
+    const id = el('rodzaj').value;
+    return rodzaje.filter(function (r) { return r.id === id; })[0];
+  }
+
+  function wyczyscFormularz() {
+    el('data').value = '';
+    zastosujRodzaj();
+  }
+
+  /**
+   * Lista osób uprawnionych do zwoływania. Posiedzenie zwołuje prezes albo
+   * upoważniony przez niego członek zarządu, odpowiednio wiceprezes
+   * (§ 46 ust. 2, § 48 ust. 4) — więc podpis nie może być wpisany na stałe.
+   */
+  function wypelnijZwolujacych(dane) {
+    const osoby = dane.osoby || [];
+    const lista = el('zwolujacy');
+
+    el('pole-zwolujacego').hidden = osoby.length === 0;
+
+    if (!osoby.length) {
+      return;
+    }
+
+    lista.innerHTML = '';
+
+    osoby.forEach(function (osoba) {
+      const opcja = document.createElement('option');
+      opcja.value = osoba.id;
+      opcja.textContent = osoba.etykieta;
+      lista.appendChild(opcja);
+    });
+
+    if (dane.domyslny) {
+      lista.value = dane.domyslny;
+    }
+  }
+
+  /**
+   * Rodzaj posiedzenia podmienia tytuł i porządek obrad. Godzinę, czas trwania
+   * i miejsce bierzemy z ostatniego posiedzenia tego samego rodzaju — te
+   * wartości rzadko się zmieniają, a wpisywanie ich od nowa to strata czasu.
+   */
+  function zastosujRodzaj() {
+    const rodzaj = wybranyRodzaj();
+    if (!rodzaj) { return; }
+
+    const poprzednie = ostatnie[rodzaj.id];
+
+    el('tytul').value = rodzaj.tytul;
+    el('porzadek').value = rodzaj.porzadek.join('\n');
+
+    el('godzina').value = poprzednie ? poprzednie.godzina : (domyslne.godzina || '11:00');
+    el('czasTrwania').value = poprzednie ? poprzednie.czasTrwania : rodzaj.czasTrwaniaMinut;
+    el('miejsce').value = poprzednie ? poprzednie.miejsce : '';
+
+    const zrodlo = el('zrodlo-podpowiedzi');
+    zrodlo.textContent = poprzednie
+      ? 'Godzina, czas trwania i miejsce z poprzedniego posiedzenia (' + poprzednie.data + ').'
+      : '';
+    zrodlo.hidden = !poprzednie;
+
+    el('etykieta-godziny').textContent = rodzaj.drugiTermin ? '(I termin)' : '';
+
+    el('wskazowka-miejsca').textContent = rodzaj.listaObecnosci
+      ? 'Uchwały i wybory wymagają listy obecności z podpisami — Meet potraktuj jako uzupełnienie obrad na miejscu.'
+      : 'Zostaw puste, jeśli posiedzenie jest wyłącznie online.';
+
+    // Komisję rewizyjną i sąd koleżeński zwołuje ich własny przewodniczący,
+    // więc lista osób idzie za organem, nie za Okręgiem.
+    wypelnijZwolujacych(rodzaj.zwolujacy || {});
+
+    el('wskazowka-zwolujacego').textContent = rodzaj.zwoluje;
+
+    opiszWymogi(rodzaj);
+    policzPunkty();
+    sprawdzWyprzedzenie();
+    dociagnijPorzadek(rodzaj);
+  }
+
+  /**
+   * Porządek obrad Zarządu Okręgu wciąga uchwały Prezydium czekające na
+   * przedłożenie (§ 48 ust. 2). Rejestru może nie być, więc szkic pokazujemy
+   * od razu, a wersję z uchwałami dociągamy w tle.
+   */
+  async function dociagnijPorzadek(rodzaj) {
+    if (!domyslne.rejestrUchwal || !rodzaj.uchwalyPrzedkladane) {
+      const inne = rodzaje.filter(function (r) { return r.uchwalyPrzedkladane; });
+      if (!inne.length) { return; }
+    }
+
+    const wybrany = rodzaj.id;
+
+    try {
+      const wynik = await serwer('pobierzPorzadekObrad', wybrany);
+
+      // Użytkownik mógł w tym czasie zmienić rodzaj albo tknąć porządek.
+      if (el('rodzaj').value !== wybrany || el('data').value) { return; }
+
+      el('porzadek').value = wynik.porzadek.join('\n');
+      policzPunkty();
+    } catch (blad) {
+      // Brak rejestru nie jest błędem: zostaje szkic ze Statutu.
+    }
+  }
+
+  /**
+   * Wymogi Statutu — zwinięte, żeby nie przytłaczać formularza, ale z tym,
+   * co najważniejsze, widocznym w nagłówku sekcji.
+   */
+  function opiszWymogi(rodzaj) {
+    const pozycje = [
+      ['Częstotliwość', rodzaj.czestotliwosc],
+      ['Zwołuje', rodzaj.zwoluje],
+    ];
+
+    if (rodzaj.wyprzedzenieDni) {
+      pozycje.push([
+        'Zawiadomienie',
+        rodzaj.wyprzedzenieDni + ' dni wcześniej' +
+        (rodzaj.naPismie ? ', na piśmie, do delegatów i zarządów kół' : ''),
+      ]);
+    }
+
+    if (rodzaj.drugiTermin) {
+      pozycje.push([
+        'Drugi termin',
+        'za ' + domyslne.odstepDrugiegoTerminu + ' min po pierwszym',
+      ]);
+    }
+
+    if (rodzaj.cyklMiesiecy) {
+      pozycje.push([
+        'Następny termin',
+        'za ' + opiszCykl(rodzaj.cyklMiesiecy) +
+        ' — narzędzie doda przypomnienie do kalendarza',
+      ]);
+    }
+
+    pozycje.push(['Podstawa', rodzaj.podstawa]);
+
+    const dl = el('wymogi-tresc');
+    dl.innerHTML = '';
+
+    pozycje.forEach(function (pozycja) {
+      const dt = document.createElement('dt');
+      dt.textContent = pozycja[0];
+
+      const dd = document.createElement('dd');
+      dd.textContent = pozycja[1];
+      if (pozycja[0] === 'Podstawa') { dd.className = 'paragraf'; }
+
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    });
+
+    el('wymogi-podsumowanie').textContent = rodzaj.wyprzedzenieDni
+      ? rodzaj.wyprzedzenieDni + ' dni wyprzedzenia · ' + rodzaj.podstawa
+      : rodzaj.podstawa;
+  }
+
+  function opiszCykl(miesiace) {
+    if (miesiace === 1) { return 'miesiąc'; }
+    if (miesiace === 3) { return 'kwartał'; }
+    if (miesiace === 12) { return 'rok'; }
+    return miesiace + ' mies.';
+  }
+
+  function policzPunkty() {
+    const punkty = el('porzadek').value
+      .split('\n')
+      .filter(function (wiersz) { return wiersz.trim().length > 0; }).length;
+
+    el('licznik-punktow').textContent = punkty + ' ' + odmienPunkty(punkty);
+  }
+
+  function odmienPunkty(ile) {
+    if (ile === 1) { return 'punkt'; }
+
+    const reszta = ile % 10;
+    const setka = ile % 100;
+    const kilka = reszta >= 2 && reszta <= 4 && (setka < 12 || setka > 14);
+
+    return kilka ? 'punkty' : 'punktów';
+  }
+
+  /** Podpowiedź pod datą — ostrzega, zanim wyślesz zawiadomienie za późno. */
+  function sprawdzWyprzedzenie() {
+    const rodzaj = wybranyRodzaj();
+    const status = el('status-terminu');
+
+    if (!rodzaj || !rodzaj.wyprzedzenieDni || !el('data').value) {
+      status.hidden = true;
+      return;
+    }
+
+    const czesci = el('data').value.split('-').map(Number);
+    const posiedzenie = new Date(czesci[0], czesci[1] - 1, czesci[2]);
+    const teraz = new Date();
+    const dzis = new Date(teraz.getFullYear(), teraz.getMonth(), teraz.getDate());
+    const dni = Math.round((posiedzenie - dzis) / 86400000);
+
+    const zaPozno = dni < rodzaj.wyprzedzenieDni;
+
+    status.hidden = false;
+    status.className = 'status ' + (zaPozno ? 'ostrzezenie' : 'ok');
+    status.querySelector('.znak').textContent = zaPozno ? '⚠' : '✓';
+    status.querySelector('.tresc').textContent = zaPozno
+      ? 'Do posiedzenia ' + dni + ' dni, a Statut wymaga ' +
+        rodzaj.wyprzedzenieDni + ' dni wyprzedzenia zawiadomienia.'
+      : 'Do posiedzenia ' + dni + ' dni — wyprzedzenie zachowane.';
+  }
+
+  el('rodzaj').addEventListener('change', zastosujRodzaj);
+  el('data').addEventListener('change', sprawdzWyprzedzenie);
+  el('porzadek').addEventListener('input', policzPunkty);
+
+  /** Wszystko, co formularz ma do powiedzenia serwerowi. */
+  function zbierzDane() {
+    return {
+      rodzaj: el('rodzaj').value,
+      tytul: el('tytul').value,
+      data: el('data').value,
+      godzina: el('godzina').value,
+      czasTrwania: el('czasTrwania').value,
+      miejsce: el('miejsce').value,
+      porzadek: el('porzadek').value,
+      zwolujacy: el('zwolujacy').value,
+    };
+  }
+
+  // ── Podgląd ──────────────────────────────────────────────────────────────
+  // Zawiadomienie powstaje i idzie do przeczytania, zanim cokolwiek trafi
+  // do kalendarza. Dopóki stąd nie wyjdziesz, w kalendarzu nie ma nic.
+
+  el('formularz').addEventListener('submit', async function (zdarzenie) {
+    zdarzenie.preventDefault();
+
+    if (!el('data').value) {
+      pokazBlad('Podaj datę posiedzenia.');
+      el('data').focus();
+      return;
+    }
+
+    await zlozPodglad(el('przycisk-utworz'));
+  });
+
+  el('przycisk-zloz-od-nowa').addEventListener('click', async function () {
+    await zlozPodglad(this);
+  });
+
+  async function zlozPodglad(przycisk) {
+    const etykieta = przycisk.textContent.trim();
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+    przycisk.textContent = 'Składam treść…';
+
+    try {
+      danePodgladu = zbierzDane();
+      pokazPodglad(await serwer('zlozPodglad', danePodgladu));
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+      przycisk.textContent = etykieta;
+    }
+  }
+
+  function pokazPodglad(podglad) {
+    el('podglad-tytul').textContent = podglad.tytul;
+    el('podglad-termin').textContent = podglad.kiedy;
+    el('podglad-tekst').value = podglad.zaproszenie;
+
+    el('wskazowka-podgladu').textContent =
+      'Wydarzenia jeszcze nie ma w kalendarzu. Link do Meet wejdzie w miejsce ' +
+      'oznaczone w tekście dopiero po kliknięciu przycisku poniżej.';
+
+    wypiszUwagi('podglad-uwagi', 'podglad-uwagi-lista', podglad.ostrzezenia || []);
+
+    el('widok-formularza').hidden = true;
+    el('widok-podgladu').hidden = false;
+    window.scrollTo(0, 0);
+    el('podglad-tytul').focus();
+  }
+
+  el('przycisk-wroc').addEventListener('click', function () {
+    el('widok-podgladu').hidden = true;
+    el('widok-formularza').hidden = false;
+    window.scrollTo(0, 0);
+    el('rodzaj').focus();
+  });
+
+  el('przycisk-zaloz').addEventListener('click', async function () {
+    const przycisk = this;
+    const etykieta = przycisk.textContent.trim();
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+    przycisk.textContent = 'Tworzę wydarzenie…';
+
+    try {
+      const dane = danePodgladu || zbierzDane();
+      dane.tresc = el('podglad-tekst').value;
+
+      pokazWynik(await serwer('utworzPosiedzenie', dane));
+
+      odswiezNadchodzace();
+      odswiezMinione();
+      odswiezStanCyklu();
+      odswiezDoZmiany();
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+      przycisk.textContent = etykieta;
+    }
+  });
+
+  // ── Wynik ────────────────────────────────────────────────────────────────
+
+  /**
+   * Ten sam widok obsługuje utworzenie posiedzenia, przeniesienie i odwołanie
+   * — za każdym razem chodzi o to samo: tekst do rozesłania i garść uwag.
+   * Czego dane zdarzenie nie ma (linku Meet, wydarzenia w kalendarzu),
+   * to się chowa.
+   */
+  function pokazWynik(wynik) {
+    tematMaila = wynik.tematMaila || wynik.temat || '';
+    idOstatniegoWydarzenia = wynik.idWydarzenia || '';
+
+    el('wynik-tytul').textContent = wynik.tytul;
+    el('wynik-termin').textContent = wynik.kiedy;
+    el('wynik-tekst').value = wynik.zaproszenie || wynik.tekst || '';
+
+    el('sekcja-linku').hidden = !wynik.linkMeet;
+    el('wynik-link').textContent = wynik.linkMeet || '';
+    el('wynik-link').href = wynik.linkMeet || '#';
+
+    el('wskazowka-wyniku').hidden = !wynik.linkWydarzenia;
+    el('wynik-wydarzenie').href = wynik.linkWydarzenia || '#';
+
+    const uwagi = (wynik.ostrzezenia || []).slice();
+
+    if (wynik.poprzedniTermin) {
+      uwagi.push('Poprzedni termin: ' + wynik.poprzedniTermin +
+        '. Link do Meet pozostał ten sam.');
+    }
+
+    // Przy dopinaniu do starego posiedzenia nie ma czego rozsyłać:
+    // zostaje sama lista dodatków.
+    const jestTresc = Boolean(wynik.zaproszenie || wynik.tekst);
+
+    el('sekcja-tresci').hidden = !jestTresc;
+
+    wypiszUwagi('uwagi', 'uwagi-lista', uwagi);
+    przygotujPrzyciskMaila();
+    pokazDodatki(wynik.dodatki);
+
+    el('widok-formularza').hidden = true;
+    el('widok-podgladu').hidden = true;
+    el('widok-wyniku').hidden = false;
+    window.scrollTo(0, 0);
+
+    // Fokus na nagłówku wyniku — czytnik ekranu odczyta, co się wydarzyło.
+    el('wynik-tytul').focus();
+
+    if (idOstatniegoWydarzenia && !wynik.linkMeet) {
+      dopytajOLinkMeet();
+    }
+  }
+
+  /**
+   * Konferencja bywa dopisywana chwilę po utworzeniu wydarzenia. Zamiast
+   * trzymać zablokowany przycisk, dopytujemy stąd, już po pokazaniu wyniku.
+   */
+  async function dopytajOLinkMeet() {
+    const id = idOstatniegoWydarzenia;
+
+    for (let proba = 0; proba < 5; proba++) {
+      await new Promise(function (dalej) { setTimeout(dalej, 2000); });
+
+      if (id !== idOstatniegoWydarzenia) { return; }
+
+      try {
+        const wynik = await serwer('sprawdzLinkMeet', id);
+
+        if (wynik.linkMeet) {
+          el('sekcja-linku').hidden = false;
+          el('wynik-link').textContent = wynik.linkMeet;
+          el('wynik-link').href = wynik.linkMeet;
+
+          const tekst = el('wynik-tekst');
+          tekst.value = tekst.value.split(MIEJSCE_NA_LINK).join(wynik.linkMeet);
+          return;
+        }
+      } catch (blad) {
+        return;
+      }
+    }
+  }
+
+  /** Wspólne wypisywanie uwag — w podglądzie i w wyniku wyglądają tak samo. */
+  function wypiszUwagi(idRamki, idListy, uwagi) {
+    const lista = el(idListy);
+    lista.innerHTML = '';
+
+    uwagi.forEach(function (uwaga) {
+      const pozycja = document.createElement('li');
+      pozycja.textContent = uwaga;
+      lista.appendChild(pozycja);
+    });
+
+    el(idRamki).hidden = uwagi.length === 0;
+  }
+
+  el('przycisk-nowe').addEventListener('click', function () {
+    danePodgladu = null;
+    wyczyscFormularz();
+    el('widok-wyniku').hidden = true;
+    el('widok-podgladu').hidden = true;
+    el('widok-formularza').hidden = false;
+    window.scrollTo(0, 0);
+    el('rodzaj').focus();
+  });
+
+  el('przycisk-kopiuj-tekst').addEventListener('click', function () {
+    kopiuj(el('wynik-tekst').value, this, 'Kopiuj tekst');
+  });
+
+  el('przycisk-kopiuj-link').addEventListener('click', function () {
+    kopiuj(el('wynik-link').textContent, this, 'Kopiuj link');
+  });
+
+  /** Schowek bywa zablokowany w ramce, więc mamy zapasowe zaznaczenie. */
+  function kopiuj(tekst, przycisk, etykieta) {
+    const potwierdz = function () {
+      przycisk.textContent = 'Skopiowano ✓';
+      el('komunikat-kopiowania').textContent = 'Skopiowano do schowka.';
+
+      setTimeout(function () {
+        przycisk.textContent = etykieta;
+        el('komunikat-kopiowania').textContent = '';
+      }, 2000);
+    };
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(tekst).then(potwierdz, zaznaczTekst);
+    } else {
+      zaznaczTekst();
+    }
+  }
+
+  function zaznaczTekst() {
+    el('wynik-tekst').select();
+    pokazBlad('Przeglądarka zablokowała schowek — tekst jest zaznaczony, skopiuj go przez Ctrl+C.');
+  }
+
+  // ── Wersja robocza maila ─────────────────────────────────────────────────
+
+  function przygotujPrzyciskMaila() {
+    const przycisk = el('przycisk-mail');
+
+    przycisk.hidden = !domyslne.mailWlaczony;
+
+    if (domyslne.mailWlaczony) {
+      przycisk.textContent = 'Przygotuj mail do ' + domyslne.liczbaAdresatow +
+        ' osób (adresy w ukrytej kopii)';
+    }
+  }
+
+  el('przycisk-mail').addEventListener('click', async function () {
+    const przycisk = this;
+    const etykieta = przycisk.textContent;
+
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+    przycisk.textContent = 'Zapisuję wersję roboczą…';
+
+    try {
+      const wynik = await serwer('utworzWersjeRoboczaMaila', {
+        temat: tematMaila,
+        tresc: el('wynik-tekst').value,
+      });
+
+      przycisk.textContent = 'Wersja robocza gotowa. Otwórz Gmaila';
+      window.open(wynik.link, '_blank', 'noopener');
+    } catch (blad) {
+      przycisk.textContent = etykieta;
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+    }
+  });
+
+  // ── Listy w panelu odniesienia ───────────────────────────────────────────
+
+  /** Pozycja listy: odnośnik w pierwszej linii, opis w drugiej. */
+  function pozycjaListy(tytul, opis, adres, plakietka) {
+    const pozycja = document.createElement('li');
+
+    if (plakietka) {
+      const znacznik = document.createElement('span');
+      znacznik.className = 'plakietka';
+      znacznik.textContent = plakietka;
+      pozycja.appendChild(znacznik);
+    }
+
+    const odnosnik = document.createElement('a');
+    odnosnik.href = adres;
+    odnosnik.target = '_blank';
+    odnosnik.rel = 'noopener';
+    odnosnik.textContent = tytul;
+    pozycja.appendChild(odnosnik);
+
+    if (opis) {
+      const podpis = document.createElement('span');
+      podpis.className = 'opis';
+      podpis.textContent = opis;
+      pozycja.appendChild(podpis);
+    }
+
+    return pozycja;
+  }
+
+  /** Licznik przy nagłówku karty bocznej; zero chowamy, bo i tak jest pustostan. */
+  function ustawLiczbe(id, ile) {
+    const znacznik = el(id);
+    znacznik.textContent = ile;
+    znacznik.hidden = ile === 0;
+  }
+
+  async function odswiezNadchodzace() {
+    try {
+      const posiedzenia = await serwer('pobierzNadchodzace');
+      const lista = el('lista-nadchodzacych');
+
+      lista.innerHTML = '';
+      el('ladowanie-nadchodzacych').hidden = true;
+      el('brak-nadchodzacych').hidden = posiedzenia.length > 0;
+      ustawLiczbe('liczba-nadchodzacych', posiedzenia.length);
+
+      posiedzenia.forEach(function (posiedzenie) {
+        const pozycja = pozycjaListy(
+          posiedzenie.tytul,
+          posiedzenie.kiedy,
+          posiedzenie.linkWydarzenia,
+          posiedzenie.termin ? 'przypomnienie'
+            : (posiedzenie.zapowiedz ? 'zapowiedź' : '')
+        );
+
+        if (posiedzenie.doDokonczenia) {
+          pozycja.appendChild(przyciskDokonczenia(posiedzenie));
+          pozycja.appendChild(przyciskFrekwencji(posiedzenie));
+        }
+
+        lista.appendChild(pozycja);
+      });
+    } catch (blad) {
+      el('ladowanie-nadchodzacych').hidden = true;
+      pokazBlad(blad.message || String(blad));
+    }
+  }
+
+  async function odswiezMinione() {
+    try {
+      const historia = await serwer('pobierzMinione');
+
+      ostatnie = historia.ostatnie || {};
+
+      // Formularz mógł się już wypełnić domyślnymi wartościami — nadpisujemy
+      // je podpowiedziami z historii, dopóki nikt nie wpisał daty.
+      if (rodzaje.length && !el('data').value) {
+        zastosujRodzaj();
+      }
+
+      const lista = el('lista-minionych');
+
+      lista.innerHTML = '';
+      el('ladowanie-minionych').hidden = true;
+      el('brak-minionych').hidden = historia.lista.length > 0;
+      ustawLiczbe('liczba-minionych', historia.lista.length);
+
+      historia.lista.forEach(function (posiedzenie) {
+        lista.appendChild(pozycjaListy(
+          posiedzenie.tytul,
+          posiedzenie.miejsce
+            ? posiedzenie.kiedy + ' · ' + posiedzenie.miejsce
+            : posiedzenie.kiedy,
+          posiedzenie.linkWydarzenia,
+          ''
+        ));
+      });
+    } catch (blad) {
+      el('ladowanie-minionych').hidden = true;
+      pokazBlad(blad.message || String(blad));
+    }
+  }
+
+  function pokazLinki(linki) {
+    const lista = el('lista-linkow');
+
+    lista.innerHTML = '';
+    el('brak-linkow').hidden = linki.length > 0;
+
+    linki.forEach(function (link) {
+      lista.appendChild(pozycjaListy(link.nazwa, link.opis, link.adres, ''));
+    });
+  }
+
+  // ── Dodatki ──────────────────────────────────────────────────────────────
+  // Każdy dodatek to osobne wywołanie serwera. Lecą równolegle, a wynik
+  // każdego ląduje w jego własnym wierszu, więc nieudany folder na Dysku
+  // nie blokuje protokołu ani niczego innego.
+
+  const OPIS_STANU_DODATKU = {
+    oczekuje: '',
+    trwa: 'dopinam…',
+    gotowe: 'gotowe',
+    pominiety: 'pominięte',
+    blad: 'nie wyszło',
+  };
+
+  function pokazDodatki(dodatki) {
+    const lista = el('lista-dodatkow');
+    const sa = (dodatki || []).length > 0;
+
+    el('sekcja-dodatkow').hidden = !sa || !idOstatniegoWydarzenia;
+    lista.innerHTML = '';
+
+    if (!sa) { return; }
+
+    dodatki.forEach(function (dodatek) {
+      lista.appendChild(pozycjaDodatku(dodatek));
+    });
+
+    // Zaznaczone domyślnie lecą od razu. Reszta czeka na przycisk.
+    dopnijZaznaczone(dodatki.filter(function (d) {
+      return d.domyslnie && d.stan !== 'gotowe';
+    }).map(function (d) { return d.id; }));
+  }
+
+  /** Wiersz dodatku: pole wyboru, nazwa, opis i stan. */
+  function pozycjaDodatku(dodatek) {
+    const pozycja = document.createElement('li');
+    pozycja.id = 'dodatek-' + dodatek.id;
+
+    const etykieta = document.createElement('label');
+    etykieta.className = 'dodatek';
+
+    const pole = document.createElement('input');
+    pole.type = 'checkbox';
+    pole.value = dodatek.id;
+    pole.checked = Boolean(dodatek.domyslnie);
+    pole.disabled = dodatek.stan === 'gotowe';
+    etykieta.appendChild(pole);
+
+    const nazwa = document.createElement('span');
+    nazwa.className = 'nazwa';
+    nazwa.textContent = dodatek.nazwa;
+    etykieta.appendChild(nazwa);
+
+    pozycja.appendChild(etykieta);
+
+    const opis = document.createElement('span');
+    opis.className = 'opis';
+    opis.textContent = dodatek.opis;
+    pozycja.appendChild(opis);
+
+    const stan = document.createElement('span');
+    stan.className = 'opis stan-dodatku';
+    pozycja.appendChild(stan);
+
+    ustawStanDodatku(pozycja, dodatek);
+    return pozycja;
+  }
+
+  function ustawStanDodatku(pozycja, dodatek) {
+    const stan = pozycja.querySelector('.stan-dodatku');
+    const opis = OPIS_STANU_DODATKU[dodatek.stan] || '';
+
+    stan.textContent = '';
+
+    if (dodatek.stan === 'gotowe' && dodatek.link) {
+      const odnosnik = document.createElement('a');
+      odnosnik.href = dodatek.link;
+      odnosnik.target = '_blank';
+      odnosnik.rel = 'noopener';
+      odnosnik.textContent = 'otwórz';
+      stan.appendChild(document.createTextNode('✓ gotowe · '));
+      stan.appendChild(odnosnik);
+    } else if (opis) {
+      stan.textContent = (dodatek.stan === 'gotowe' ? '✓ ' : '') + opis;
+    }
+
+    if (dodatek.komunikat) {
+      stan.appendChild(document.createTextNode(
+        (stan.textContent ? ' · ' : '') + dodatek.komunikat
+      ));
+    }
+
+    const pole = pozycja.querySelector('input');
+    if (pole) { pole.disabled = dodatek.stan === 'gotowe'; }
+  }
+
+  el('przycisk-dodatki').addEventListener('click', function () {
+    const zaznaczone = Array.prototype.slice
+      .call(el('lista-dodatkow').querySelectorAll('input:checked:not(:disabled)'))
+      .map(function (pole) { return pole.value; });
+
+    if (!zaznaczone.length) {
+      pokazBlad('Zaznacz przynajmniej jeden dodatek.');
+      return;
+    }
+
+    dopnijZaznaczone(zaznaczone);
+  });
+
+  /** „Dokończ” przy posiedzeniu na liście najbliższych. */
+  function przyciskDokonczenia(posiedzenie) {
+    const przycisk = document.createElement('button');
+
+    przycisk.type = 'button';
+    przycisk.className = 'akcja';
+    przycisk.textContent = 'Dokończ';
+    przycisk.addEventListener('click', function () {
+      pokazDokonczenie(posiedzenie);
+    });
+
+    return przycisk;
+  }
+
+
+  /**
+   * Otwiera samą listę dodatków dla wskazanego posiedzenia. Stan bierzemy
+   * z wydarzenia, więc widać, co już powstało, choćby tydzień temu.
+   */
+  async function pokazDokonczenie(posiedzenie) {
+    schowajBlad();
+
+    try {
+      const stan = await serwer('pobierzStanDodatkow', posiedzenie.id);
+
+      idOstatniegoWydarzenia = stan.id;
+
+      pokazWynik({
+        idWydarzenia: stan.id,
+        tytul: stan.tytul,
+        kiedy: posiedzenie.kiedy,
+        linkWydarzenia: posiedzenie.linkWydarzenia,
+        dodatki: stan.dodatki.map(function (dodatek) {
+          // Przy dopinaniu po fakcie nic nie leci samo z siebie.
+          return Object.assign({}, dodatek, { domyslnie: false });
+        }),
+        ostrzezenia: [],
+      });
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    }
+  }
+
+
+  function dopnijZaznaczone(identyfikatory) {
+    if (!identyfikatory.length || !idOstatniegoWydarzenia) { return; }
+
+    schowajBlad();
+
+    identyfikatory.forEach(function (id) {
+      const pozycja = el('dodatek-' + id);
+      if (!pozycja) { return; }
+
+      ustawStanDodatku(pozycja, { stan: 'trwa', komunikat: '' });
+      pozycja.setAttribute('aria-busy', 'true');
+
+      serwer('dopnijDodatek', { id: idOstatniegoWydarzenia, dodatek: id })
+        .then(function (wynik) {
+          ustawStanDodatku(pozycja, wynik);
+        })
+        .catch(function (blad) {
+          ustawStanDodatku(pozycja, {
+            stan: 'blad',
+            komunikat: blad.message || String(blad),
+          });
+        })
+        .then(function () {
+          pozycja.removeAttribute('aria-busy');
+          odswiezNadchodzace();
+        });
+    });
+  }
+
+  // ── Terminy statutowe ────────────────────────────────────────────────────
+
+  const ETYKIETY_STANU = {
+    przekroczony: 'po terminie',
+    brak: 'brak danych',
+    blisko: 'termin blisko',
+    ok: '',
+  };
+
+  async function odswiezStanCyklu() {
+    try {
+      const stany = await serwer('pobierzStanCyklu');
+      const lista = el('lista-cyklu');
+
+      lista.innerHTML = '';
+      el('ladowanie-cyklu').hidden = true;
+      el('brak-cyklu').hidden = stany.length > 0;
+
+      ustawLiczbe('liczba-zaleglosci', stany.filter(function (stan) {
+        return stan.stan === 'przekroczony';
+      }).length);
+
+      stany.forEach(function (stan) {
+        lista.appendChild(pozycjaStanu(stan));
+      });
+    } catch (blad) {
+      el('ladowanie-cyklu').hidden = true;
+      pokazBlad(blad.message || String(blad));
+    }
+  }
+
+  /** Pozycja bez odnośnika — sam stan i zdanie, które go tłumaczy. */
+  const MIESIACE = [
+    'stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca',
+    'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia',
+  ];
+
+  /** Zamienia „9 września 2026 r." na datę. Zwraca null, gdy się nie da. */
+  function zeSformatowanej(tekst) {
+    const czesci = /^(\d{1,2})\s+(\S+)\s+(\d{4})/.exec((tekst || '').trim());
+    if (!czesci) { return null; }
+
+    const miesiac = MIESIACE.indexOf(czesci[2]);
+    if (miesiac < 0) { return null; }
+
+    return new Date(Number(czesci[3]), miesiac, Number(czesci[1]));
+  }
+
+  /**
+   * Jaka część cyklu już upłynęła, w przedziale 0–1.
+   * Bez kompletu dat nie zgadujemy — wtedy null i wiersz zostaje bez paska.
+   */
+  function udzialCyklu(stan) {
+    if (stan.stan === 'przekroczony') { return 1; }
+
+    const od = zeSformatowanej(stan.ostatnie);
+    const do_ = zeSformatowanej(stan.termin);
+    if (!od || !do_ || do_ <= od) { return null; }
+
+    const teraz = new Date();
+    const dzis = new Date(teraz.getFullYear(), teraz.getMonth(), teraz.getDate());
+
+    return Math.min(1, Math.max(0, (dzis - od) / (do_ - od)));
+  }
+
+  /** Wiersz wskaźnika: nazwa organu, pasek cyklu, stan słowem. */
+  function pozycjaStanu(stan) {
+    const pozycja = document.createElement('li');
+    pozycja.dataset.stan = stan.stan;
+
+    const organ = document.createElement('span');
+    organ.className = 'organ';
+    organ.textContent = stan.nazwa;
+
+    if (stan.cykl) {
+      const cykl = document.createElement('span');
+      cykl.className = 'cykl';
+      cykl.textContent = 'co ' + stan.cykl;
+      organ.appendChild(cykl);
+    }
+
+    pozycja.appendChild(organ);
+
+    const udzial = udzialCyklu(stan);
+
+    if (udzial === null) {
+      // Bez dat pasek byłby zmyśleniem; zostaje pusty odstęp.
+      pozycja.appendChild(document.createElement('span'));
+    } else {
+      const tor = document.createElement('span');
+      tor.className = 'tor';
+      tor.setAttribute('role', 'img');
+      tor.setAttribute('aria-label',
+        'Upłynęło ' + Math.round(udzial * 100) + '% cyklu.');
+
+      const wypelnienie = document.createElement('span');
+      wypelnienie.className = 'wypelnienie';
+      wypelnienie.style.width = Math.round(udzial * 100) + '%';
+
+      tor.appendChild(wypelnienie);
+      pozycja.appendChild(tor);
+    }
+
+    const opis = document.createElement('span');
+    opis.className = 'stan';
+
+    const etykieta = ETYKIETY_STANU[stan.stan];
+    if (etykieta) {
+      const nazwaStanu = document.createElement('span');
+      nazwaStanu.className = 'etykieta';
+      nazwaStanu.textContent = etykieta;
+      opis.appendChild(nazwaStanu);
+    }
+
+    opis.appendChild(document.createTextNode(stan.zdanie));
+    pozycja.appendChild(opis);
+
+    return pozycja;
+  }
+
+  // ── Przypomnienie dzień wcześniej ────────────────────────────────────────
+
+  function przygotujPrzypomnienia(stan) {
+    const przycisk = el('przycisk-przypomnienia');
+    const wskazowka = el('wskazowka-przypomnien');
+
+    przycisk.hidden = !stan.dostepne;
+    wskazowka.hidden = !stan.dostepne;
+
+    if (!stan.dostepne) { return; }
+
+    przycisk.textContent = stan.zainstalowany
+      ? 'Wyłącz przypomnienia D-1'
+      : 'Włącz przypomnienia D-1';
+
+    wskazowka.textContent = stan.zainstalowany
+      ? 'Codziennie o ' + stan.godzina + ':00 narzędzie przygotuje w Gmailu ' +
+        'wersję roboczą przypomnienia o jutrzejszym posiedzeniu. Nic nie ' +
+        'wychodzi samo — wysyłasz ręcznie.'
+      : 'Możesz włączyć codzienne przygotowywanie wersji roboczej ' +
+        'przypomnienia o jutrzejszym posiedzeniu.';
+  }
+
+  el('przycisk-przypomnienia').addEventListener('click', async function () {
+    const przycisk = this;
+    const wlaczone = przycisk.textContent.indexOf('Wyłącz') === 0;
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+
+    try {
+      przygotujPrzypomnienia(
+        await serwer(wlaczone ? 'usunPrzypomnienia' : 'zainstalujPrzypomnienia')
+      );
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+    }
+  });
+
+  // ── Odwołanie i przeniesienie ────────────────────────────────────────────
+
+  async function odswiezDoZmiany() {
+    try {
+      const posiedzenia = await serwer('pobierzDoZmiany');
+      const lista = el('zmiana-posiedzenie');
+
+      el('karta-zmiany').hidden = posiedzenia.length === 0;
+      lista.innerHTML = '';
+
+      posiedzenia.forEach(function (posiedzenie) {
+        const opcja = document.createElement('option');
+        opcja.value = posiedzenie.id;
+        opcja.textContent = posiedzenie.tytul + ' — ' + posiedzenie.kiedy;
+        opcja.dataset.data = posiedzenie.data;
+        opcja.dataset.godzina = posiedzenie.godzina;
+        opcja.dataset.czas = posiedzenie.czasTrwania;
+        lista.appendChild(opcja);
+      });
+
+      podstawTerminDoZmiany();
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    }
+  }
+
+  /** Pola nowego terminu startują z obecnego — zwykle zmienia się sam dzień. */
+  function podstawTerminDoZmiany() {
+    const lista = el('zmiana-posiedzenie');
+    const wybrana = lista.options[lista.selectedIndex];
+
+    if (!wybrana) { return; }
+
+    el('zmiana-data').value = wybrana.dataset.data || '';
+    el('zmiana-godzina').value = wybrana.dataset.godzina || '';
+  }
+
+  el('zmiana-posiedzenie').addEventListener('change', podstawTerminDoZmiany);
+
+  el('przycisk-przenies').addEventListener('click', async function () {
+    const lista = el('zmiana-posiedzenie');
+    const wybrana = lista.options[lista.selectedIndex];
+
+    if (!wybrana) { return; }
+
+    if (!el('zmiana-data').value) {
+      pokazBlad('Podaj nową datę posiedzenia.');
+      el('zmiana-data').focus();
+      return;
+    }
+
+    await zmienPosiedzenie(this, 'przeniesPosiedzenie', {
+      id: lista.value,
+      data: el('zmiana-data').value,
+      godzina: el('zmiana-godzina').value,
+      czasTrwania: wybrana.dataset.czas,
+      powod: el('zmiana-powod').value,
+      zwolujacy: el('zwolujacy').value,
+    });
+  });
+
+  el('przycisk-odwolaj').addEventListener('click', async function () {
+    const lista = el('zmiana-posiedzenie');
+    const wybrana = lista.options[lista.selectedIndex];
+
+    if (!wybrana) { return; }
+
+    // Odwołanie zdejmuje posiedzenie z kalendarza wszystkim zaproszonym,
+    // więc pytamy, zanim to zrobimy.
+    if (!window.confirm('Odwołać: ' + wybrana.textContent + '?')) {
+      return;
+    }
+
+    await zmienPosiedzenie(this, 'odwolajPosiedzenie', {
+      id: lista.value,
+      powod: el('zmiana-powod').value,
+      zwolujacy: el('zwolujacy').value,
+    });
+  });
+
+  async function zmienPosiedzenie(przycisk, operacja, dane) {
+    const etykieta = przycisk.textContent.trim();
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+    przycisk.textContent = 'Zmieniam…';
+
+    try {
+      pokazWynik(await serwer(operacja, dane));
+
+      el('zmiana-powod').value = '';
+      odswiezNadchodzace();
+      odswiezMinione();
+      odswiezStanCyklu();
+      odswiezDoZmiany();
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+      przycisk.textContent = etykieta;
+    }
+  }
+
+  // ── Frekwencja ───────────────────────────────────────────────────────────
+
+  /** „Frekwencja” przy posiedzeniu: kto potwierdził i czy starczy na kworum. */
+  function przyciskFrekwencji(posiedzenie) {
+    const przycisk = document.createElement('button');
+
+    przycisk.type = 'button';
+    przycisk.className = 'akcja';
+    przycisk.textContent = 'Frekwencja';
+    przycisk.addEventListener('click', async function () {
+      schowajBlad();
+
+      try {
+        pokazFrekwencje(await serwer('pobierzFrekwencje', posiedzenie.id));
+      } catch (blad) {
+        pokazBlad(blad.message || String(blad));
+      }
+    });
+
+    return przycisk;
+  }
+
+  function pokazFrekwencje(wynik) {
+    const zdania = [wynik.werdykt];
+
+    if (wynik.zaproszonych) {
+      zdania.push('Zaproszonych: ' + wynik.zaproszonych + '. ' +
+        wynik.pozycje.map(function (p) {
+          return p.nazwa + ': ' + p.ile;
+        }).join(', ') + '.');
+    }
+
+    // Frekwencja to informacja, nie błąd, więc idzie w pasek uwag.
+    el('wynik-tytul').textContent = wynik.tytul;
+    el('wynik-termin').textContent = 'Frekwencja';
+    el('sekcja-tresci').hidden = true;
+    el('sekcja-linku').hidden = true;
+    el('sekcja-dodatkow').hidden = true;
+    el('wskazowka-wyniku').hidden = true;
+
+    wypiszUwagi('uwagi', 'uwagi-lista', zdania);
+
+    el('widok-formularza').hidden = true;
+    el('widok-podgladu').hidden = true;
+    el('widok-wyniku').hidden = false;
+    window.scrollTo(0, 0);
+    el('wynik-tytul').focus();
+  }
+
+  // ── Plan roczny ──────────────────────────────────────────────────────────
+
+  function przygotujPlan() {
+    const lista = el('plan-rodzaj');
+    const cykliczne = rodzaje.filter(function (r) { return r.cyklMiesiecy; });
+
+    el('szczegoly-planu').hidden = cykliczne.length === 0;
+    lista.innerHTML = '';
+
+    cykliczne.forEach(function (rodzaj) {
+      const opcja = document.createElement('option');
+      opcja.value = rodzaj.id;
+      opcja.textContent = rodzaj.nazwa;
+      lista.appendChild(opcja);
+    });
+
+    el('plan-rok').value = new Date().getFullYear() + 1;
+  }
+
+  el('przycisk-plan-propozycja').addEventListener('click', async function () {
+    const przycisk = this;
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+
+    try {
+      wypiszPlan(await serwer('zaproponujPlan', {
+        rodzaj: el('plan-rodzaj').value,
+        rok: el('plan-rok').value,
+        dzienTygodnia: domyslne.preferowanyDzienTygodnia,
+        ktoryTydzien: domyslne.ktoryTydzienMiesiaca,
+      }));
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+    }
+  });
+
+  function wypiszPlan(plan) {
+    const lista = el('lista-planu');
+
+    lista.innerHTML = '';
+    el('przycisk-plan-zapis').hidden = plan.terminy.length === 0;
+
+    plan.terminy.forEach(function (termin) {
+      const pozycja = document.createElement('li');
+      const etykieta = document.createElement('label');
+      etykieta.className = 'dodatek';
+
+      const pole = document.createElement('input');
+      pole.type = 'checkbox';
+      pole.value = termin.data;
+      pole.checked = termin.wybrany;
+      etykieta.appendChild(pole);
+
+      const nazwa = document.createElement('span');
+      nazwa.className = 'nazwa';
+      nazwa.textContent = termin.opis;
+      etykieta.appendChild(nazwa);
+
+      pozycja.appendChild(etykieta);
+
+      if (termin.uwaga || termin.zajety) {
+        const opis = document.createElement('span');
+        opis.className = 'opis';
+        opis.textContent = termin.zajety
+          ? 'W tym miesiącu posiedzenie już jest w kalendarzu.'
+          : termin.uwaga;
+        pozycja.appendChild(opis);
+      }
+
+      lista.appendChild(pozycja);
+    });
+  }
+
+  el('przycisk-plan-zapis').addEventListener('click', async function () {
+    const przycisk = this;
+    const daty = Array.prototype.slice
+      .call(el('lista-planu').querySelectorAll('input:checked'))
+      .map(function (pole) { return pole.value; });
+
+    if (!daty.length) {
+      pokazBlad('Zaznacz przynajmniej jeden termin.');
+      return;
+    }
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+
+    try {
+      const wynik = await serwer('utworzPlan', {
+        rodzaj: el('plan-rodzaj').value,
+        daty: daty,
+      });
+
+      el('lista-planu').innerHTML = '';
+      przycisk.hidden = true;
+      wypiszUwagi('uwagi', 'uwagi-lista', [wynik.komunikat]);
+      odswiezNadchodzace();
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+    }
+  });
+
+  // ── Rejestr uchwał ───────────────────────────────────────────────────────
+
+  function przygotujRejestr() {
+    const lista = el('uchwala-rodzaj');
+
+    el('szczegoly-rejestru').hidden = !domyslne.rejestrUchwal;
+
+    if (!domyslne.rejestrUchwal) { return; }
+
+    lista.innerHTML = '';
+
+    rodzaje.forEach(function (rodzaj) {
+      const opcja = document.createElement('option');
+      opcja.value = rodzaj.id;
+      opcja.textContent = rodzaj.nazwa;
+      lista.appendChild(opcja);
+    });
+
+    lista.addEventListener('change', podpowiedzPrzedlozenie);
+    podpowiedzPrzedlozenie();
+    odswiezRejestr();
+  }
+
+  /** Uchwały Prezydium zwykle podlegają przedłożeniu, uchwały Zarządu nie. */
+  function podpowiedzPrzedlozenie() {
+    const wybrany = rodzaje.filter(function (r) {
+      return r.id === el('uchwala-rodzaj').value;
+    })[0];
+
+    el('uchwala-podlega').checked = Boolean(wybrany && wybrany.uchwalyPrzedkladane);
+  }
+
+  el('przycisk-uchwala').addEventListener('click', async function () {
+    const przycisk = this;
+
+    schowajBlad();
+    przycisk.disabled = true;
+    przycisk.setAttribute('aria-busy', 'true');
+
+    try {
+      const wynik = await serwer('zarejestrujUchwale', {
+        rodzaj: el('uchwala-rodzaj').value,
+        data: el('uchwala-data').value,
+        przedmiot: el('uchwala-przedmiot').value,
+        podlega: el('uchwala-podlega').checked,
+      });
+
+      el('uchwala-przedmiot').value = '';
+      wypiszUwagi('uwagi', 'uwagi-lista', ['Zapisano: ' + wynik.numer]);
+      odswiezRejestr();
+    } catch (blad) {
+      pokazBlad(blad.message || String(blad));
+    } finally {
+      przycisk.disabled = false;
+      przycisk.removeAttribute('aria-busy');
+    }
+  });
+
+  async function odswiezRejestr() {
+    try {
+      const rejestr = await serwer('pobierzRejestr');
+      const lista = el('lista-uchwal');
+
+      lista.innerHTML = '';
+      el('brak-uchwal').hidden = rejestr.pozycje.length > 0;
+      el('licznik-uchwal').textContent = rejestr.doPrzedlozenia
+        ? rejestr.doPrzedlozenia + ' do przedłożenia'
+        : '';
+
+      rejestr.pozycje.forEach(function (uchwala) {
+        lista.appendChild(pozycjaListy(
+          uchwala.numer,
+          uchwala.przedmiot + ' · ' + uchwala.data,
+          rejestr.link,
+          uchwala.czeka ? 'do przedłożenia' : ''
+        ));
+      });
+    } catch (blad) {
+      // Rejestr powstaje dopiero przy pierwszej uchwale; pusto to nie błąd.
+      el('brak-uchwal').hidden = false;
+    }
+  }
+
+  // ── Komunikaty ───────────────────────────────────────────────────────────
+
+  function pokazBlad(tresc) {
+    el('blad').textContent = tresc;
+    el('blad').hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  function schowajBlad() {
+    el('blad').hidden = true;
+  }
+</script>
