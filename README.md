@@ -47,6 +47,7 @@ Związku”.
 | Posiedzenie Okręgowej Komisji Rewizyjnej  | kontrola ZO raz w roku | —    | § 49–50       |
 | Posiedzenie Okręgowego Sądu Koleżeńskiego | doraźnie       | —            | § 51–52       |
 | Posiedzenie komisji problemowej ZO        | wg regulaminu  | —            | § 47 pkt 12   |
+| Posiedzenie Okręgowego Kapitanatu Sportowego | wg regulaminu | —          | § 47 pkt 12 i 16 |
 | Narada z prezesami kół                    | doraźnie       | —            | § 47 pkt 29   |
 
 Reguły, których narzędzie pilnuje w tle:

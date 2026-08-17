@@ -108,7 +108,7 @@ szkicu porządku obrad:
 | 13  | umowy, nieruchomości, działalność gospodarcza                        |
 | 14  | jednostki gospodarcze i spółki prawa handlowego — **kworum kwalifikowane** |
 | 15  | ochrona i zagospodarowanie wód                                       |
-| 16  | działalność sportowa i rekreacyjna, kadry okręgowe                   |
+| 16  | działalność sportowa i rekreacyjna, kadry okręgowe **na wniosek okręgowego kapitanatu sportowego** |
 | 17  | praca z młodzieżą wędkarską                                          |
 | 18  | działalność szkoleniowa                                              |
 | 20  | nadzór nad obsługą finansowo-księgową kół                            |
@@ -161,6 +161,33 @@ w terminie **10 dni** od wyborów.
 **§ 52** — działa na podstawie regulaminu uchwalonego przez Zarząd Główny;
 sprawozdanie na zjeździe oraz **informacja raz w roku na posiedzeniu zarządu
 okręgu**.
+
+## Okręgowy kapitanat sportowy (OKS)
+
+Nie jest władzą ani organem okręgu w rozumieniu § 38 – to **komisja zarządu
+okręgu**, powołana na podstawie **§ 47 pkt 12** („powoływanie komisji
+niezbędnych do realizacji zadań okręgu oraz uchwalanie ich regulaminów”).
+
+Statut wymienia go jednak wprost w **§ 47 pkt 16**: zarząd okręgu organizuje
+działalność sportową i wyłania okręgowe kadry **„na wniosek okręgowego
+kapitanatu sportowego”**. To jedyne miejsce w Statucie, gdzie Kapitanat
+występuje z nazwy, i stąd bierze się kierunek jego wniosków.
+
+Zakres pracy Kapitanatu w Okręgu Mazowieckim wynika z **regulaminu zawodów
+wędkarskich i wyłaniania Kadry Okręgu** (załącznik do uchwały nr 442/II/2024
+Zarządu Okręgu Mazowieckiego z 24 lutego 2025 r., [ompzw.pl](https://ompzw.pl/files/filesfile/1/file-8325.pdf)):
+Mistrzostwa Okręgu, cykl Grand Prix, Kadra Okręgu.
+
+**Czego nie ustaliliśmy.** Regulamin **organizacyjny** OKS Okręgu Mazowieckiego
+– skład, kadencja, kworum, tryb zwoływania posiedzeń – nie jest opublikowany
+w serwisie `ompzw.pl`. Regulaminy OKS innych okręgów (np. wzorzec na
+`pzw.org.pl`) mówią o składzie do 14 osób, posiedzeniach zwoływanych przez
+przewodniczącego i kworum połowy członków, ale **nie wolno ich tu przenosić**:
+skład i regulamin każdej komisji uchwala jej własny zarząd okręgu.
+Dlatego wpis `kapitanat` ma `kworum: ''`, `sklad: 0` i `cyklMiesiecy: 0`.
+
+Wzorcowy regulamin powołuje się na „§ 46 pkt 12” – to **stara numeracja**.
+W tekście jednolitym z 2017 r. komisje to § 47 pkt 12.
 
 ## Czego tu NIE ma — pułapka
 

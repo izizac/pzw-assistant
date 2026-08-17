@@ -748,6 +748,62 @@ const RODZAJE_POSIEDZEN = [
   },
 
   {
+    /**
+     * Kapitanat skraca się do OKS, ale identyfikatora „oks” tu nie ma celowo:
+     * o jeden przestawiony znak od „osk”, czyli Okręgowego Sądu Koleżeńskiego.
+     * Pomyłka kosztowałaby zawiadomienie wysłane nie temu organowi.
+     */
+    id: 'kapitanat',
+    nazwa: 'Posiedzenie Okręgowego Kapitanatu Sportowego',
+    tytul: 'Posiedzenie Okręgowego Kapitanatu Sportowego OM PZW',
+    zdanieZwolania: 'zwołuję posiedzenie Okręgowego Kapitanatu Sportowego {okregu}, które odbędzie się',
+    czasTrwaniaMinut: 120,
+    wyprzedzenieDni: 0,
+    naPismie: false,
+    drugiTermin: false,
+    /**
+     * Statut nie ustala kworum dla komisji Zarządu Okręgu – robi to regulamin
+     * Kapitanatu uchwalony przez Zarząd (§ 47 pkt 12). Regulaminu Okręgu
+     * Mazowieckiego nie udało się znaleźć w serwisie ompzw.pl, więc zdanie
+     * o prawomocności zostaje puste zamiast powielać liczby z innego okręgu.
+     */
+    kworum: '',
+    listaObecnosci: true,
+    niejawne: false,
+    cyklMiesiecy: 0,
+    zwoluje: 'Przewodniczący Okręgowego Kapitanatu Sportowego, zgodnie z regulaminem uchwalonym przez Zarząd Okręgu (§ 47 pkt 12).',
+    czestotliwosc: 'W miarę potrzeb, wedle regulaminu Kapitanatu. Statut nie wyznacza cyklu (§ 47 pkt 12).',
+    /**
+     * Kadry okręgowe wyłania Zarząd Okręgu, ale wyłącznie na wniosek
+     * Kapitanatu (§ 47 pkt 16). Ten akapit przypomina, dokąd trafia wynik obrad.
+     */
+    dopiskFormalny: 'Wnioski Kapitanatu w sprawie okręgowych kadr wędkarskich przedkłada się Zarządowi Okręgu, który wyłania kadry na wniosek Kapitanatu (§ 47 pkt 16 Statutu PZW).',
+    podstawa: '§ 47 pkt 12 i 16 Statutu PZW',
+    nazwaOrganu: 'Okręgowego Kapitanatu Sportowego OM PZW',
+    /** Skład ustala Zarząd Okręgu; obsady kadencji 2026–2030 nie potwierdzono. */
+    sklad: 0,
+    kworumUlamek: null,
+    /** Posiedzenia zwołuje przewodniczący Kapitanatu, nie prezes Zarządu. */
+    wlasniZwolujacy: true,
+    zwolujacy: [],
+    adresy: [],
+    /* Punkty 3–8 odwzorowują zakres pracy Kapitanatu wynikający z regulaminu
+       zawodów OM PZW (uchwała nr 442/II/2024 Zarządu Okręgu Mazowieckiego). */
+    porzadek: [
+      '1. Otwarcie posiedzenia.',
+      '2. Przyjęcie protokołu z poprzedniego posiedzenia.',
+      '3. Terminarz zawodów okręgowych i Mistrzostw Okręgu.',
+      '4. Regulaminy sportowe Mistrzostw Okręgu i cyklu Grand Prix.',
+      '5. Obsada sędziowska zawodów okręgowych oraz ocena jej pracy.',
+      '6. Weryfikacja wyników zawodów.',
+      '7. Wyłanianie Kadry Okręgu – wnioski do Zarządu Okręgu (§ 47 pkt 16).',
+      '8. Protesty, odwołania i kary za przewinienia sportowe.',
+      '9. Sprawy różne i wolne wnioski.',
+      '10. Zamknięcie posiedzenia.',
+    ],
+  },
+
+  {
     id: 'narada-kol',
     nazwa: 'Narada z prezesami kół',
     tytul: 'Narada Zarządu Okręgu z prezesami kół OM PZW',
