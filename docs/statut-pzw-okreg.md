@@ -173,17 +173,47 @@ działalność sportową i wyłania okręgowe kadry **„na wniosek okręgowego
 kapitanatu sportowego”**. To jedyne miejsce w Statucie, gdzie Kapitanat
 występuje z nazwy, i stąd bierze się kierunek jego wniosków.
 
-Zakres pracy Kapitanatu w Okręgu Mazowieckim wynika z **regulaminu zawodów
-wędkarskich i wyłaniania Kadry Okręgu** (załącznik do uchwały nr 442/II/2024
-Zarządu Okręgu Mazowieckiego z 24 lutego 2025 r., [ompzw.pl](https://ompzw.pl/files/filesfile/1/file-8325.pdf)):
-Mistrzostwa Okręgu, cykl Grand Prix, Kadra Okręgu.
+Rolę Kapitanatu opisują zgodnie oba szczeble. **Zasady Organizacji Sportu
+Wędkarskiego** ZG PZW, cz. I pkt 8: *„Sportem wędkarskim na szczeblu okręgu
+kieruje Zarząd Okręgu PZW przy pomocy Okręgowego Kapitanatu Sportowego”*.
+Regulamin zawodów OM PZW powtarza to własnymi słowami w pkt 1.1.
 
-**Czego nie ustaliliśmy.** Regulamin **organizacyjny** OKS Okręgu Mazowieckiego
-– skład, kadencja, kworum, tryb zwoływania posiedzeń – nie jest opublikowany
-w serwisie `ompzw.pl`. Regulaminy OKS innych okręgów (np. wzorzec na
-`pzw.org.pl`) mówią o składzie do 14 osób, posiedzeniach zwoływanych przez
-przewodniczącego i kworum połowy członków, ale **nie wolno ich tu przenosić**:
-skład i regulamin każdej komisji uchwala jej własny zarząd okręgu.
+### Co Kapitanat robi cyklicznie
+
+Zakres pracy w Okręgu Mazowieckim wynika z **regulaminu zawodów wędkarskich
+i wyłaniania Kadry Okręgu** (załącznik do uchwały nr 442/II/2024 Zarządu
+Okręgu Mazowieckiego z 24 lutego 2025 r.,
+[ompzw.pl](https://ompzw.pl/files/filesfile/1/file-8325.pdf)) oraz z **ZOSW**
+([kopia na ompzw.pl](https://ompzw.pl/files/filesfile/1/file-5400.pdf)):
+
+| Zadanie                                                | Źródło       |
+| ------------------------------------------------------ | ------------ |
+| Terminarz zawodów okręgowych, zatwierdza Zarząd Okręgu  | reg. OM 1.6  |
+| Regulaminy Mistrzostw Okręgu, limity uczestników        | ZOSW 2.2     |
+| Kadra Okręgu, zatwierdzanie propozycji przewodniczących dyscyplin | reg. OM |
+| Kolegium sędziowskie przy OKS, min. 5 osób; przewodniczy członek Kapitanatu | ZOSW 1.19 |
+| Egzaminy na sędziego klasy podstawowej i okręgowej      | ZOSW 1.6.1   |
+| Ewidencja sędziów klas podstawowej, okręgowej, krajowej | ZOSW 1.21    |
+| Nadawanie klas sportowych **drugiej i trzeciej**, do 31 grudnia | ZOSW § 4–5 |
+| Coroczne listy zawodników do Głównego Kapitanatu Sportowego | ZOSW § 5 |
+
+Dyscypliny w OM PZW wedle regulaminu zawodów: spławikowa, spinningowa,
+muchowa, feederowa, karpiowa, podlodowa. Każda ma **przewodniczącego
+dyscypliny**, który proponuje skład kadry, a zatwierdza go OKS.
+
+### Czego nie ustaliliśmy
+
+Regulaminu **organizacyjnego** OKS Okręgu Mazowieckiego – skład, kadencja,
+kworum, tryb zwoływania posiedzeń – ani imiennego składu z przewodniczącym.
+Sprawdzone 17 sierpnia 2026 r. i **nieznalezione** w: plikach i wyszukiwarce
+`ompzw.pl`, `om.pzw.pl/sport/*`, `om.pzw.pl/strefa-pzw/*` oraz w wyszukiwarce
+internetowej. Nie szukaj drugi raz w tych miejscach, zapytaj biuro Okręgu.
+
+Regulaminy OKS innych okręgów (wzorzec na
+[pzw.org.pl](https://pzw.org.pl/pliki/prezentacje/31/wiadomosci/57679/pliki/regulamin_oks.pdf))
+mówią o składzie do 14 osób, posiedzeniach zwoływanych przez przewodniczącego
+i kworum połowy członków, ale **nie wolno ich tu przenosić**: skład i regulamin
+każdej komisji uchwala jej własny zarząd okręgu.
 Dlatego wpis `kapitanat` ma `kworum: ''`, `sklad: 0` i `cyklMiesiecy: 0`.
 
 Wzorcowy regulamin powołuje się na „§ 46 pkt 12” – to **stara numeracja**.

@@ -772,7 +772,7 @@ const RODZAJE_POSIEDZEN = [
     niejawne: false,
     cyklMiesiecy: 0,
     zwoluje: 'Przewodniczący Okręgowego Kapitanatu Sportowego, zgodnie z regulaminem uchwalonym przez Zarząd Okręgu (§ 47 pkt 12).',
-    czestotliwosc: 'W miarę potrzeb, wedle regulaminu Kapitanatu. Statut nie wyznacza cyklu (§ 47 pkt 12).',
+    czestotliwosc: 'W miarę potrzeb, wedle regulaminu Kapitanatu. Statut nie wyznacza cyklu (§ 47 pkt 12), ale rytm narzuca sezon: terminarz przed sezonem, klasy sportowe do 31 grudnia, listy zawodników do GKS raz w roku.',
     /**
      * Kadry okręgowe wyłania Zarząd Okręgu, ale wyłącznie na wniosek
      * Kapitanatu (§ 47 pkt 16). Ten akapit przypomina, dokąd trafia wynik obrad.
@@ -787,19 +787,22 @@ const RODZAJE_POSIEDZEN = [
     wlasniZwolujacy: true,
     zwolujacy: [],
     adresy: [],
-    /* Punkty 3–8 odwzorowują zakres pracy Kapitanatu wynikający z regulaminu
-       zawodów OM PZW (uchwała nr 442/II/2024 Zarządu Okręgu Mazowieckiego). */
+    /* Punkty 3–9 to powtarzalne obowiązki Kapitanatu. Terminarz, regulaminy
+       Mistrzostw i Kadra Okręgu wynikają z regulaminu zawodów OM PZW
+       (uchwała nr 442/II/2024); sędziowie, klasy sportowe i listy do GKS
+       z Zasad Organizacji Sportu Wędkarskiego ZG PZW. Patrz docs. */
     porzadek: [
       '1. Otwarcie posiedzenia.',
       '2. Przyjęcie protokołu z poprzedniego posiedzenia.',
-      '3. Terminarz zawodów okręgowych i Mistrzostw Okręgu.',
-      '4. Regulaminy sportowe Mistrzostw Okręgu i cyklu Grand Prix.',
-      '5. Obsada sędziowska zawodów okręgowych oraz ocena jej pracy.',
-      '6. Weryfikacja wyników zawodów.',
-      '7. Wyłanianie Kadry Okręgu – wnioski do Zarządu Okręgu (§ 47 pkt 16).',
-      '8. Protesty, odwołania i kary za przewinienia sportowe.',
-      '9. Sprawy różne i wolne wnioski.',
-      '10. Zamknięcie posiedzenia.',
+      '3. Terminarz zawodów okręgowych, do zatwierdzenia przez Zarząd Okręgu.',
+      '4. Regulaminy sportowe Mistrzostw Okręgu i cyklu Grand Prix oraz limity uczestników.',
+      '5. Kolegium sędziowskie: obsada zawodów okręgowych i ocena pracy sędziów.',
+      '6. Egzaminy na sędziego klasy podstawowej i okręgowej oraz ewidencja sędziów (ZOSW).',
+      '7. Weryfikacja wyników zawodów i nadanie klas sportowych drugiej i trzeciej (ZOSW, termin do 31 grudnia).',
+      '8. Kadra Okręgu: wnioski do Zarządu Okręgu (§ 47 pkt 16) i coroczne listy zawodników do Głównego Kapitanatu Sportowego.',
+      '9. Protesty, odwołania i kary za przewinienia sportowe.',
+      '10. Sprawy różne i wolne wnioski.',
+      '11. Zamknięcie posiedzenia.',
     ],
   },
 
