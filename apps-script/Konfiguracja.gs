@@ -378,10 +378,8 @@ const KONFIG = {
   naglowekInstrukcji: 'Jak dołączyć do posiedzenia online',
 
   instrukcjaWejscia: [
-    'Nie trzeba mieć konta Google ani niczego instalować. Wystarczy kliknąć powyższy link.',
-    'Link otworzy się w przeglądarce. Zezwól na dostęp do mikrofonu i kamery.',
-    'Jeśli nie jesteś zalogowany w Google, wpisz swoje imię i nazwisko i kliknij „Poproś o dołączenie”. Wpuszczę Cię na posiedzenie.',
-    'Najlepiej połączyć się 5 minut przed czasem, żeby spokojnie sprawdzić dźwięk.',
+    'Wystarczy kliknąć link. Konta Google ani instalacji nie trzeba.',
+    'Niezalogowani podają imię i nazwisko, a potem czekają na wpuszczenie. Warto połączyć się 5 minut wcześniej.',
   ],
 
   /** Zdanie doklejane pod linkiem Meet przy posiedzeniach zwykłych. */
@@ -777,15 +775,25 @@ const RODZAJE_POSIEDZEN = [
      * Kadry okręgowe wyłania Zarząd Okręgu, ale wyłącznie na wniosek
      * Kapitanatu (§ 47 pkt 16). Ten akapit przypomina, dokąd trafia wynik obrad.
      */
-    dopiskFormalny: 'Wnioski Kapitanatu w sprawie okręgowych kadr wędkarskich przedkłada się Zarządowi Okręgu, który wyłania kadry na wniosek Kapitanatu (§ 47 pkt 16 Statutu PZW).',
+    dopiskFormalny: 'Kadry okręgowe wyłania Zarząd Okręgu na wniosek Kapitanatu (§ 47 pkt 16 Statutu PZW).',
     podstawa: '§ 47 pkt 12 i 16 Statutu PZW',
     nazwaOrganu: 'Okręgowego Kapitanatu Sportowego OM PZW',
     /** Skład ustala Zarząd Okręgu; obsady kadencji 2026–2030 nie potwierdzono. */
     sklad: 0,
     kworumUlamek: null,
-    /** Posiedzenia zwołuje przewodniczący Kapitanatu, nie prezes Zarządu. */
+    /**
+     * Posiedzenia Kapitanatu organizuje Daniel Sobczak, wiceprezes Zarządu
+     * Okręgu ds. Sportu. Bierzemy jego wpis z KONFIG.zwolujacy zamiast
+     * przepisywać nazwisko, żeby zmiana w wykazie nie wymagała poprawki
+     * w dwóch miejscach.
+     *
+     * Czy pełni zarazem funkcję przewodniczącego Kapitanatu, nie wynika
+     * z żadnego opublikowanego dokumentu Okręgu – patrz docs.
+     */
     wlasniZwolujacy: true,
-    zwolujacy: [],
+    zwolujacy: KONFIG.zwolujacy.filter(function (osoba) {
+      return osoba.id === 'sobczak';
+    }),
     adresy: [],
     /* Punkty 3–9 to powtarzalne obowiązki Kapitanatu. Terminarz, regulaminy
        Mistrzostw i Kadra Okręgu wynikają z regulaminu zawodów OM PZW
@@ -795,14 +803,13 @@ const RODZAJE_POSIEDZEN = [
       '1. Otwarcie posiedzenia.',
       '2. Przyjęcie protokołu z poprzedniego posiedzenia.',
       '3. Terminarz zawodów okręgowych, do zatwierdzenia przez Zarząd Okręgu.',
-      '4. Regulaminy sportowe Mistrzostw Okręgu i cyklu Grand Prix oraz limity uczestników.',
-      '5. Kolegium sędziowskie: obsada zawodów okręgowych i ocena pracy sędziów.',
-      '6. Egzaminy na sędziego klasy podstawowej i okręgowej oraz ewidencja sędziów (ZOSW).',
-      '7. Weryfikacja wyników zawodów i nadanie klas sportowych drugiej i trzeciej (ZOSW, termin do 31 grudnia).',
-      '8. Kadra Okręgu: wnioski do Zarządu Okręgu (§ 47 pkt 16) i coroczne listy zawodników do Głównego Kapitanatu Sportowego.',
-      '9. Protesty, odwołania i kary za przewinienia sportowe.',
-      '10. Sprawy różne i wolne wnioski.',
-      '11. Zamknięcie posiedzenia.',
+      '4. Regulaminy Mistrzostw Okręgu i cyklu Grand Prix oraz limity uczestników.',
+      '5. Sprawy sędziowskie: obsada zawodów, egzaminy na klasę podstawową i okręgową, ewidencja (ZOSW).',
+      '6. Weryfikacja wyników i klasy sportowe druga i trzecia, w terminie do 31 grudnia (ZOSW).',
+      '7. Kadra Okręgu: wnioski do Zarządu Okręgu (§ 47 pkt 16) i listy zawodników do GKS.',
+      '8. Protesty, odwołania i kary za przewinienia sportowe.',
+      '9. Sprawy różne i wolne wnioski.',
+      '10. Zamknięcie posiedzenia.',
     ],
   },
 

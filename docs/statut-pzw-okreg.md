@@ -201,6 +201,18 @@ Dyscypliny w OM PZW wedle regulaminu zawodów: spławikowa, spinningowa,
 muchowa, feederowa, karpiowa, podlodowa. Każda ma **przewodniczącego
 dyscypliny**, który proponuje skład kadry, a zatwierdza go OKS.
 
+### Kto zwołuje
+
+Posiedzenia Kapitanatu organizuje **Daniel Sobczak**, wiceprezes Zarządu
+Okręgu ds. Sportu (wykaz składu Zarządu, kadencja 2026–2030). Stąd
+`zwolujacy` przy rodzaju `kapitanat` wskazuje wyłącznie jego, zamiast
+podstawiać cały trzynastoosobowy Zarząd.
+
+Czy pełni zarazem funkcję **przewodniczącego Kapitanatu**, nie wynika
+z żadnego opublikowanego dokumentu Okręgu. Wzorcowe regulaminy OKS mówią,
+że posiedzenia zwołuje przewodniczący Kapitanatu; tutaj wiemy tylko, kto
+je organizuje w praktyce.
+
 ### Czego nie ustaliliśmy
 
 Regulaminu **organizacyjnego** OKS Okręgu Mazowieckiego – skład, kadencja,
